@@ -113,7 +113,7 @@ export default function Register() {
               <Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
                 Already have an account?{' '}
                 <Link variant="subtitle2" to="/login" component={RouterLink}>
-                  Login
+                  Login 
                 </Link>
               </Typography>
             )}
