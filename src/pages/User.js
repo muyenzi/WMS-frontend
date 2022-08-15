@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState } from 'react';
@@ -18,6 +19,15 @@ import {
   TableContainer,
   TablePagination,
 } from '@mui/material';
+
+
+import TextField from '@mui/material/TextField';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
 // components
 import Page from '../components/Page';
 import Label from '../components/Label';
@@ -29,12 +39,28 @@ import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashbo
 import USERLIST from '../_mock/user';
 
 // ----------------------------------------------------------------------
+const roles=[{
+  value:"SuperAdmin",
+  label:"Super Admin"
+},
+{
+  value:"Admin",
+  label:"Admin"
+},
+{
+  value:"User",
+  label:"User"
+},
+{
+  value:"OrganistionLeader",
+  label:"Organistion Leader"
+},
+]
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
+  { id: 'email', label: 'Email', alignRight: false },
   { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
   { id: '' },
 ];
@@ -81,7 +107,21 @@ export default function User() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
+  const [role, setRole] = React.useState('User');
+
+  const handleChange = (event) => {
+    setRole(event.target.value);
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -133,13 +173,14 @@ export default function User() {
   const isUserNotFound = filteredUsers.length === 0;
 
   return (
-    <Page title="User">
+    <>
+     <Page title="User">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             User
           </Typography>
-          <Button variant="contained" component={RouterLink} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
+          <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
           </Button>
         </Stack>
@@ -186,7 +227,7 @@ export default function User() {
                         </TableCell>
                         <TableCell align="left">{company}</TableCell>
                         <TableCell align="left">{role}</TableCell>
-                        <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                        {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
                         <TableCell align="left">
                           <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
                             {sentenceCase(status)}
@@ -231,5 +272,58 @@ export default function User() {
         </Card>
       </Container>
     </Page>
+    <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>user information</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            please provide user unformation. We
+            will send updates occasionally.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="FullNames"
+            label="Full Names"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+           <TextField
+            autoFocus
+            margin="dense"
+            id="email"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+            <TextField
+          id="outlined-select-currency-native"
+          select
+          label="Native select"
+          value={role}
+          fullWidth
+          variant="standard"
+          onChange={handleChange}
+          SelectProps={{
+            native: true,
+          }}
+          helperText="Please select the Role"
+        >
+          {roles.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+    </>
+   
   );
 }
