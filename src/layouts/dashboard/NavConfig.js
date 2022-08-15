@@ -11,8 +11,9 @@ const navConfig = [
     path: '/dashboard/app',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
+
   {
-    title: 'user',
+    title: 'users',
     path: '/dashboard/user',
     icon: getIcon('eva:people-fill'),
   },
@@ -22,7 +23,28 @@ const navConfig = [
     icon: getIcon('eva:shopping-bag-fill'),
   },
   {
-    title: 'blog',
+    title: 'roles',
+    path: '/dashboard/user',
+    icon: getIcon('eva:people-fill'),
+  },
+
+  {
+    title: 'permission',
+    path: '/dashboard/user',
+    icon: getIcon('eva:people-fill'),
+  },
+  {
+    title: 'data collection',
+    path: '/dashboard/user',
+    icon: getIcon('eva:people-fill'),
+  },
+  // {
+  //   title: 'blog',
+  //   path: '/dashboard/blog',
+  //   icon: getIcon('eva:file-text-fill'),
+  // },
+  {
+    title: 'organization',
     path: '/dashboard/blog',
     icon: getIcon('eva:file-text-fill'),
   },
