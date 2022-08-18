@@ -202,7 +202,7 @@ export default function User() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                    const { id, name, role, status, company, avatarUrl} = row;
                     const isItemSelected = selected.indexOf(name) !== -1;
 
                     return (

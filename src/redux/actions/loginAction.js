@@ -5,12 +5,12 @@ import {
     LOGIN_FAILURE,
   } from "../types/loginTypes";
   
-  import jwt from "jsonwebtoken";
-  import dotenv from "dotenv";
-  dotenv.config();
+  // import jwt from "jsonwebtoken";
+  // import dotenv from "dotenv";
+  // dotenv.config();
 
 
-export const loginAction = (user,history) => async (dispatch) => {
+export const loginAction = (user,navigate) => async (dispatch) => {
   try {
     dispatch(loginRequest());
     const {email}=user
@@ -22,18 +22,18 @@ export const loginAction = (user,history) => async (dispatch) => {
    const res = await axios.post(Url,{
     email:email,
     password:password
-   }, {
-     withCredentials: true,
-    headers:{
-    "Accept":"application/json",
-    "Content-Type": "application/json",
-  //'Authorization': + basicAuth,
- },
+//    }, {
+//      withCredentials: true,
+//     headers:{
+//     "Accept":"application/json",
+//     "Content-Type": "application/json",
+//   //'Authorization': + basicAuth,
+//  },
  
    });
     const {data} = await res;
       dispatch(loginSuccess(data));
-      //navigate('/dashboard/app', { replace: true });
+      navigate('/dashboard/app', { replace: true });
     
 
   } catch (err) {
