@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // material
 import {
@@ -35,8 +35,11 @@ import Scrollbar from '../components/Scrollbar';
 import Iconify from '../components/Iconify';
 import SearchNotFound from '../components/SearchNotFound';
 import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashboard/user';
+import { useDispatch,useSelector } from 'react-redux';
 // mock
 import USERLIST from '../_mock/user';
+
+import { getUsersAction } from "../redux/actions/getUsersAction"
 
 // ----------------------------------------------------------------------
 const roles=[{
@@ -109,7 +112,21 @@ export default function User() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
   const [role, setRole] = React.useState('User');
+  const [usersDetails,setUsersDetails]=useState('')
+ const dispatch=useDispatch();
+ const getAllUsers=useSelector(state=>state.getUsers);
 
+ useEffect(() => {
+  async function fetchData() {
+    await dispatch(getUsersAction())
+    if (!getAllUsers.loading) {
+      if (getAllUsers.users) {
+        setUsersDetails(getAllUsers.users.data)
+      }
+    }
+  }
+  fetchData();
+}, [!getAllUsers.users]);
   const handleChange = (event) => {
     setRole(event.target.value);
   };
@@ -206,6 +223,7 @@ export default function User() {
                     const isItemSelected = selected.indexOf(name) !== -1;
 
                     return (
+                   
                       <TableRow
                         hover
                         key={id}
@@ -219,14 +237,14 @@ export default function User() {
                         </TableCell>
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
-                            <Avatar alt={name} src={avatarUrl} />
+                           
                             <Typography variant="subtitle2" noWrap>
-                              {name}
+                              Mahame Alfred
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{company}</TableCell>
-                        <TableCell align="left">{role}</TableCell>
+                        <TableCell align="left">mahamealfred@gmail.com</TableCell>
+                        <TableCell align="left">User</TableCell>
                         {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
                         <TableCell align="left">
                           <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
