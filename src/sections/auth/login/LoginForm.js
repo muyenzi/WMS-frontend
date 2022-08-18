@@ -40,7 +40,7 @@ export default function LoginForm() {
   } = methods;
 
   const onSubmit = async () => {
-    navigate('/dashboard/app', { replace: true });
+    
   };
 
   return (
