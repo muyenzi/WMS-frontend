@@ -1,7 +1,9 @@
 import { faker } from '@faker-js/faker';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Container, Typography } from '@mui/material';
+
+import PropTypes from 'prop-types';
+import { Box, Card, Paper, Typography,Container, Grid,CardHeader, CardContent, Button } from '@mui/material';
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
@@ -29,6 +31,62 @@ export default function DashboardApp() {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Water Managment System Dashboard
         </Typography>
+        <Grid item xs={12} md={6} lg={4}>
+        <Card >
+      <CardHeader title="Informations" subheader="Selecct service" />
+
+      <CardContent>
+        <Box
+          sx={{
+            display: 'grid',
+            gap: 2,
+            gridTemplateColumns: 'repeat(2, 1fr)',
+          }}
+        >
+          
+          <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
+          <Button
+          sx={{ py: 2.5, textAlign: 'center' }}
+          >
+              {/* <Box sx={{ mb: 0.5 }}>icon</Box> */}
+              <Typography variant="h6">Schools</Typography>
+
+              </Button>
+            </Paper>
+            <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
+          <Button
+          sx={{ py: 2.5, textAlign: 'center' }}
+          >
+              {/* <Box sx={{ mb: 0.5 }}>icon</Box> */}
+              <Typography variant="h6">Public Place</Typography>
+
+              </Button>
+            </Paper>
+            <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
+          <Button
+          sx={{ py: 2.5, textAlign: 'center' }}
+          >
+              {/* <Box sx={{ mb: 0.5 }}>icon</Box> */}
+              <Typography variant="h6">Health Facilities</Typography>
+
+              </Button>
+            </Paper>
+            <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
+          <Button
+          sx={{ py: 2.5, textAlign: 'center' }}
+          >
+              {/* <Box sx={{ mb: 0.5 }}>icon</Box> */}
+              <Typography variant="h6">Organizations</Typography>
+
+              </Button>
+            </Paper>
+          
+         
+         
+        </Box>
+      </CardContent>
+    </Card>
+    </Grid>
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3}>

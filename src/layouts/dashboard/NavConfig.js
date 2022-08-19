@@ -23,9 +23,19 @@ const navConfig = [
     icon: getIcon('eva:shopping-bag-fill'),
   },
   {
-    title: 'roles',
-    path: '/dashboard/user',
-    icon: getIcon('eva:people-fill'),
+    title: 'Schools',
+    path: '/dashboard/schools',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
+  {
+    title: 'Organizations',
+    path: '/dashboard/organizations',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
+  {
+    title: 'House Holds',
+    path: '/dashboard/households',
+    icon: getIcon('eva:pie-chart-2-fill'),
   },
 
   {
@@ -38,14 +48,15 @@ const navConfig = [
     path: '/dashboard/user',
     icon: getIcon('eva:people-fill'),
   },
-  // {
-  //   title: 'blog',
-  //   path: '/dashboard/blog',
-  //   icon: getIcon('eva:file-text-fill'),
-  // },
+ 
   {
-    title: 'organization',
-    path: '/dashboard/blog',
+    title: 'Organizations',
+    path: '/dashboard/organizations',
+    icon: getIcon('eva:file-text-fill'),
+  },
+  {
+    title: 'Organizations',
+    path: '/dashboard/organizations',
     icon: getIcon('eva:file-text-fill'),
   },
   {
@@ -65,4 +76,8 @@ const navConfig = [
   },
 ];
 
+ 
+  
+
 export default navConfig;
+

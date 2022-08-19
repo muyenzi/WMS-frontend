@@ -14,6 +14,8 @@ import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
 //
 import navConfig from './NavConfig';
+import navConfigAdmin from './NavConfigAdmin'
+//import navConfigAdmin from './NavConfig';
 
 // ----------------------------------------------------------------------
 
@@ -95,9 +97,10 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
           </AccountStyle>
         </Link>
       </Box>
-
+    {/* condition */}
+   
       <NavSection navConfig={navConfig} />
-
+      {/* <NavSection navConfig={navConfigAdmin} /> */}
       <Box sx={{ flexGrow: 1 }} />
 
       <Box sx={{ px: 2.5, pb: 3, mt: 10 }}>

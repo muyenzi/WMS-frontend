@@ -82,7 +82,7 @@ export default function Login() {
         {mdUp && (
           <SectionStyle>
             <Typography variant="h3" sx={{ px: 5, mt: 2, mb: 5 }}>
-              Water Managementt System
+              Water Management System
             </Typography>
             <img src="/static/images/backgroundimage.jpeg" alt="login" />
           </SectionStyle>
@@ -91,12 +91,12 @@ export default function Login() {
         <Container maxWidth="sm">
           <ContentStyle>
             <Typography variant="h4" gutterBottom>
-              Sign in to Minimal 
+              Sign in to WMS
             </Typography>
 
             <Typography sx={{ color: 'text.secondary', mb: 5 }}>Enter your details below.</Typography>
 
-            <AuthSocial />
+            {/* <AuthSocial /> */}
 
             <LoginForm />
 
