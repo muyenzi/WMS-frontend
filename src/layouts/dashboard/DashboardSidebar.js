@@ -60,8 +60,24 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
         '& .simplebar-content': { height: 1, display: 'flex', flexDirection: 'column' },
       }}
     >
-      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex' }}>
-        <Logo />
+      <Box sx={{ px: 2.5, py: 3, display: 'inline-flex', backgroundColor:"#ffff"}}>
+      <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              "& > *": {
+                m: 1,
+              },
+            }}
+          >
+            <img
+              src="../../../static/images/logo.png"
+              alt=""
+              className="topAvatar"
+              
+            />
+          </Box>
       </Box>
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
@@ -101,8 +117,8 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
             </Typography>
           </Box>
 
-          <Button href="https://material-ui.com/store/items/minimal-dashboard/" target="_blank" variant="contained">
-            Upgrade to Pro
+          <Button href="/" target="_blank" variant="contained">
+            Logout
           </Button>
         </Stack>
       </Box>

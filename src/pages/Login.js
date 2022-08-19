@@ -10,7 +10,7 @@ import Logo from '../components/Logo';
 // sections
 import { LoginForm } from '../sections/auth/login';
 import AuthSocial from '../sections/auth/AuthSocial';
-
+import TopBar from "../components/topbar/TopBar";
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -62,6 +62,8 @@ export default function Login() {
   const mdUp = useResponsive('up', 'md');
 
   return (
+    <>
+    <TopBar/>
     <Page title="Login">
       <RootStyle>
         <HeaderStyle>
@@ -79,10 +81,10 @@ export default function Login() {
 
         {mdUp && (
           <SectionStyle>
-            <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
-              Hi, Welcome Back
+            <Typography variant="h3" sx={{ px: 5, mt: 2, mb: 5 }}>
+              Water Managementt System
             </Typography>
-            <img src="/static/illustrations/illustration_login.png" alt="login" />
+            <img src="/static/images/backgroundimage.jpeg" alt="login" />
           </SectionStyle>
         )}
 
@@ -110,5 +112,7 @@ export default function Login() {
         </Container>
       </RootStyle>
     </Page>
+    </>
+   
   );
 }
