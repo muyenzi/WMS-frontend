@@ -39,8 +39,13 @@ import { useDispatch,useSelector } from 'react-redux';
 // mock
 import USERLIST from '../_mock/user';
 
-import { getUsersAction } from "../redux/actions/getUsersAction"
+import { getUsersAction } from "../redux/actions/getUsersAction";
+import { addUserAction } from 'src/redux/actions/addUserAction';
 
+import Collapse from "@mui/material/Collapse";
+import Alert from '@mui/material/Alert'
+import CloseIcon from '@mui/icons-material/Close';
+import {  IconButton} from '@mui/material';
 // ----------------------------------------------------------------------
 const roles=[{
   value:"SuperAdmin",
@@ -110,25 +115,41 @@ export default function User() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [open, setOpen] = React.useState(false);
+  const [openSuccess, setOpenSuccess] = React.useState(false);
   const [role, setRole] = React.useState('User');
-  const [usersDetails,setUsersDetails]=useState('')
+  const [fullname,setFullname]=useState('')
+  const [usersDetails,setUsersDetails]=useState([])
  const dispatch=useDispatch();
  const getAllUsers=useSelector(state=>state.getUsers);
+ const addUser=useSelector(state=>state.addUser);
 
+const handleAddNewUser=async()=>{
+await dispatch(addUserAction({fullname,role},navigator))
+if(addUser.error){
+  setOpen(true)
+}
+if(addUser.users){
+  setOpenSuccess(true)
+}
+setFullname('')
+setRole('User')
+}
  useEffect(() => {
   async function fetchData() {
     await dispatch(getUsersAction())
     if (!getAllUsers.loading) {
       if (getAllUsers.users) {
-        setUsersDetails(getAllUsers.users.data)
+        setUsersDetails(getAllUsers.users)
       }
     }
   }
   fetchData();
-}, [!getAllUsers.users]);
+}, [getAllUsers.users]);
   const handleChange = (event) => {
     setRole(event.target.value);
+    setFullname(event.target.value);
   };
 
   const handleClickOpen = () => {
@@ -137,6 +158,7 @@ export default function User() {
 
   const handleClose = () => {
     setOpen(false);
+    setOpenSuccess(false)
   };
 
 
@@ -148,7 +170,7 @@ export default function User() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = usersDetails.map((n) => n.fullname);
       setSelected(newSelecteds);
       return;
     }
@@ -190,9 +212,10 @@ export default function User() {
   const isUserNotFound = filteredUsers.length === 0;
 
   return (
-    <>
+    <React.Fragment>
      <Page title="User">
       <Container>
+      
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
             User
@@ -212,49 +235,55 @@ export default function User() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={usersDetails.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl} = row;
-                    const isItemSelected = selected.indexOf(name) !== -1;
-
+                  {usersDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    const { id, fullname, role, status, company, avatarUrl} = row;
+                    const isItemSelected = selected.indexOf(fullname) !== -1;
+                    console.log("lllly g",usersDetails)
                     return (
                    
                       <TableRow
                         hover
-                        key={id}
+                        key={row.id}
                         tabIndex={-1}
                         role="checkbox"
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} />
-                        </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                           
-                            <Typography variant="subtitle2" noWrap>
-                              Mahame Alfred
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="left">mahamealfred@gmail.com</TableCell>
-                        <TableCell align="left">User</TableCell>
-                        {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
-                        <TableCell align="left">
-                          <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
-                            {sentenceCase(status)}
-                          </Label>
-                        </TableCell>
+                      <TableCell padding="checkbox">
+                      <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, fullname)} />
+                    </TableCell>
 
-                        <TableCell align="right">
-                          <UserMoreMenu />
-                        </TableCell>
+                      <TableCell component="th" scope="row" padding="none">
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                       
+                        <Typography variant="subtitle2" noWrap>
+                          {row.fullname}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell align="left">{row.email}</TableCell>
+                    <TableCell align="left">{row.role}</TableCell>
+                    {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
+                    <TableCell align="left">
+                    {row.isActive==true?
+                      <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
+                       Active
+                      </Label>: <Label variant="ghost" color={ 'success'|| (status === 'banned' && 'error')}>
+                      Inactive
+                     </Label>
+                    }
+                      
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <UserMoreMenu />
+                    </TableCell>
                       </TableRow>
                     );
                   })}
@@ -297,32 +326,74 @@ export default function User() {
             please provide user unformation. We
             will send updates occasionally.
           </DialogContentText>
+          {
+            !addUser.error? null:
+             <Collapse in={open}>
+             <Alert
+             severity="error"
+               action={
+                 <IconButton
+                   aria-label="close"
+                   color="inherit"
+                   size="small"
+                   onClick={handleClose}
+                 
+                 >
+                   <CloseIcon fontSize="inherit" />
+                 </IconButton>
+               }
+               sx={{ mb: 0.2 }}
+             >
+              {addUser.error}
+             </Alert>
+           </Collapse>
+          }    
+          {
+            addUser.users? <Collapse in={openSuccess}>
+            <Alert
+            severity="success"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={handleClose}
+                
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+              sx={{ mb: 0.2 }}
+            >
+             {addUser.users}
+            </Alert>
+          </Collapse>:null
+          }
+         
           <TextField
             autoFocus
             margin="dense"
-            id="FullNames"
-            label="Full Names"
+            id="fullname"
+            name="fullname"
+            onChange={(e)=>setFullname(e.target.value)}
+            value={fullname}
+            label="Full Name"
+            required
             type="text"
             fullWidth
             variant="standard"
           />
-           <TextField
-            autoFocus
-            margin="dense"
-            id="email"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
+          
             <TextField
           id="outlined-select-currency-native"
           select
-          label="Native select"
+          label="Select Role"
           value={role}
+          name="role"
           fullWidth
+          required
           variant="standard"
-          onChange={handleChange}
+          onChange={(e)=>setRole(e.target.value)}
           SelectProps={{
             native: true,
           }}
@@ -337,11 +408,13 @@ export default function User() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
+          <Button onClick={handleAddNewUser}>
+          {addUser.loading ? "Loading..." : "Save"}
+          </Button>
         </DialogActions>
       </Dialog>
 
-    </>
+    </React.Fragment>
    
   );
 }

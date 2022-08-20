@@ -4,10 +4,6 @@ import {
     LOGIN_SUCCESS,
     LOGIN_FAILURE,
   } from "../types/loginTypes";
-  
-  // import jwt from "jsonwebtoken";
-  // import dotenv from "dotenv";
-  // dotenv.config();
 
 
 export const loginAction = (user,navigate) => async (dispatch) => {
@@ -22,18 +18,28 @@ export const loginAction = (user,navigate) => async (dispatch) => {
    const res = await axios.post(Url,{
     email:email,
     password:password
-//    }, {
-//      withCredentials: true,
-//     headers:{
-//     "Accept":"application/json",
-//     "Content-Type": "application/json",
-//   //'Authorization': + basicAuth,
-//  },
- 
    });
     const {data} = await res;
+   
+      if(data.status===200){
+      const token=res.data.data.token
+      const email=res.data.data.user
+     const role= res.data.data.role
+    const fullName=res.data.data.fullName
+      const userData={email,role,fullName}
+      console.log("object",email,role,userData)
       dispatch(loginSuccess(data));
-      navigate('/dashboard/app', { replace: true });
+      if(role==="SuperAdmin" || role==="Admin" || role=="User"){
+        navigate('/dashboard/app', { replace: true });
+      return (localStorage.setItem('wmsAuth',token),localStorage.setItem('userAuth',JSON.stringify(userData)));
+      }
+      else{
+        navigate('/dashboard/organizations', { replace: true });
+        return (localStorage.setItem('wmsAuth',token),localStorage.setItem('userAuth',userData));
+      }
+    
+      }
+ 
     
 
   } catch (err) {

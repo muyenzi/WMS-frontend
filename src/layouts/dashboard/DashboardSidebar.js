@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { useEffect } from 'react';
+import { useEffect ,useState} from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 // material
 import { styled } from '@mui/material/styles';
 import { Box, Link, Button, Drawer, Typography,  Stack } from '@mui/material';
@@ -45,15 +46,35 @@ DashboardSidebar.propTypes = {
 
 export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
   const { pathname } = useLocation();
-
+ const [fullname,setFullname]=useState('')
+ const [role,setRole]=useState('');
+ const navigate=useNavigate()
+ 
   const isDesktop = useResponsive('up', 'lg');
-
+  const handleLogout=()=>{
+    localStorage.removeItem('wmsAuth')
+    localStorage.removeItem('userAuth')
+    navigate('/login',)
+  }
   useEffect(() => {
+
     if (isOpenSidebar) {
       onCloseSidebar();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  useEffect(() => {
+    const auth=localStorage.getItem("wmsAuth")
+    const userAuth=localStorage.getItem("userAuth")
+    if(auth && userAuth){
+      const  {role} =JSON.parse(userAuth)
+      const { fullName}=JSON.parse(userAuth)
+      setFullname(fullName)
+      setRole(role)
+    }
+
+  }, []);
 
   const renderContent = (
     <Scrollbar
@@ -88,18 +109,25 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
             {/* <Avatar src={account.photoURL} alt="photoURL" /> */}
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                Muyenzi Raissa Auca
+                {fullname}
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                SuperAdmin
+                {role}
               </Typography>
             </Box>
           </AccountStyle>
         </Link>
       </Box>
     {/* condition */}
-   
-      <NavSection navConfig={navConfig} />
+   {role=="Admin"?
+   <NavSection navConfig={navConfigAdmin} /> :null
+  
+  }
+  {
+    role=="SuperAdmin"?
+    <NavSection navConfig={navConfigAdmin} />:null
+  }
+      
       {/* <NavSection navConfig={navConfigAdmin} /> */}
       <Box sx={{ flexGrow: 1 }} />
 
@@ -120,7 +148,7 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
             </Typography>
           </Box>
 
-          <Button href="/" target="_blank" variant="contained">
+          <Button onClick={handleLogout} target="_blank" variant="contained">
             Logout
           </Button>
         </Stack>

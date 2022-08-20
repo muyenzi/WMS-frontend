@@ -12,7 +12,7 @@ export const getUsersAction = () => async (dispatch) => {
     const Url='http://localhost:8000/api/auth/users';
    const res = await axios.get(Url);
     const {data} = await res;
-      dispatch(getUsersSuccess(data));
+      dispatch(getUsersSuccess(data.data));
 
   } catch (err) {
     if (err.response) {

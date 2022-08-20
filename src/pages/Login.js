@@ -11,6 +11,7 @@ import Logo from '../components/Logo';
 import { LoginForm } from '../sections/auth/login';
 import AuthSocial from '../sections/auth/AuthSocial';
 import TopBar from "../components/topbar/TopBar";
+import React from 'react';
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -62,7 +63,7 @@ export default function Login() {
   const mdUp = useResponsive('up', 'md');
 
   return (
-    <>
+    <React.Fragment>
     <TopBar/>
     <Page title="Login">
       <RootStyle>
@@ -99,7 +100,13 @@ export default function Login() {
             {/* <AuthSocial /> */}
 
             <LoginForm />
-
+            <Typography variant="body2" align="center" sx={{ color: 'text.secondary', mt: 3 }}>
+            Don’t have an account?{' '}
+            <Link variant="subtitle2" to="/register" component={RouterLink}>
+              Register
+            </Link>
+              .
+            </Typography>
             {!smUp && (
               <Typography variant="body2" align="center" sx={{ mt: 3 }}>
                 Don’t have an account?{' '}
@@ -112,7 +119,7 @@ export default function Login() {
         </Container>
       </RootStyle>
     </Page>
-    </>
+    </React.Fragment>
    
   );
 }

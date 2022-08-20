@@ -52,8 +52,11 @@ export default function LoginForm() {
   } = methods;
 
   const onSubmit = async (values) => {
-    console.log("values:",values)
+   
     await dispatch(loginAction(values,navigate))
+    if(userLogin.error){
+      setOpen(true)
+    }
   };
 
   return (
@@ -70,9 +73,7 @@ export default function LoginForm() {
              color="inherit"
              size="small"
              onClick={handleClose}
-            //  onClick={() => {
-            //    setOpen(false);
-            //  }}
+           
            >
              <CloseIcon fontSize="inherit" />
            </IconButton>

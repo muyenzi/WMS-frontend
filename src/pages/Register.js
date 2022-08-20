@@ -10,7 +10,8 @@ import Logo from '../components/Logo';
 // sections
 import { RegisterForm } from '../sections/auth/register';
 import AuthSocial from '../sections/auth/AuthSocial';
-
+import React from 'react';
+import TopBar from "../components/topbar/TopBar";
 // ----------------------------------------------------------------------
 
 const RootStyle = styled('div')(({ theme }) => ({
@@ -62,64 +63,70 @@ export default function Register() {
   const mdUp = useResponsive('up', 'md');
 
   return (
+    <React.Fragment>
+    <TopBar/>
+
     <Page title="Register">
-      <RootStyle>
-        <HeaderStyle>
-          <Logo />
-          {smUp && (
-            <Typography variant="body2" sx={{ mt: { md: -2 } }}>
-              Already have an account? {''}
-              <Link variant="subtitle2" component={RouterLink} to="/login">
-                Login
+    <RootStyle>
+      <HeaderStyle>
+        <Logo />
+        {smUp && (
+          <Typography variant="body2" sx={{ mt: { md: -2 } }}>
+            Already have an account? {''}
+            <Link variant="subtitle2" component={RouterLink} to="/login">
+              Login
+            </Link>
+          </Typography>
+        )}
+      </HeaderStyle>
+
+      {mdUp && (
+        <SectionStyle>
+          <Typography variant="h3" sx={{ px: 5, mt: 2, mb: 5 }}>
+          Water Management System
+          </Typography>
+          <img src="/static/images/backgroundimage.jpeg" alt="login" />
+        </SectionStyle>
+      )}
+
+      <Container>
+        <ContentStyle>
+          <Typography variant="h4" gutterBottom>
+            Enroll Your Self
+          </Typography>
+
+          <Typography sx={{ color: 'text.secondary', mb: 5 }}>Free forever. No credit card needed.</Typography>
+
+          <RegisterForm />
+          {!smUp && (
+            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+              Already have an account?{' '}
+              <Link variant="subtitle2" to="/login" component={RouterLink}>
+                Login 
               </Link>
             </Typography>
           )}
-        </HeaderStyle>
+          <Typography variant="body2" align="center" sx={{ color: 'text.secondary', mt: 3 }}>
+          Already have an account?{' '}
+          <Link variant="subtitle2" to="/login" component={RouterLink}>
+            Login 
+          </Link>
+            .
+          </Typography>
 
-        {mdUp && (
-          <SectionStyle>
-            <Typography variant="h3" sx={{ px: 5, mt: 10, mb: 5 }}>
-              Manage the job more effectively with Minimal
-            </Typography>
-            <img alt="register" src="/static/illustrations/illustration_register.png" />
-          </SectionStyle>
-        )}
-
-        <Container>
-          <ContentStyle>
-            <Typography variant="h4" gutterBottom>
-              Get started absolutely free.
-            </Typography>
-
-            <Typography sx={{ color: 'text.secondary', mb: 5 }}>Free forever. No credit card needed.</Typography>
-
-            <AuthSocial />
-
-            <RegisterForm />
-
-            <Typography variant="body2" align="center" sx={{ color: 'text.secondary', mt: 3 }}>
-              By registering, I agree to Minimal&nbsp;
-              <Link underline="always" color="text.primary" href="#">
-                Terms of Service
+          {!smUp && (
+            <Typography variant="body2" sx={{ mt: 1, textAlign: 'center' }}>
+              Already have an account?{' '}
+              <Link variant="subtitle2" to="/login" component={RouterLink}>
+                Login 
               </Link>
-              {''}and{''}
-              <Link underline="always" color="text.primary" href="#">
-                Privacy Policy
-              </Link>
-              .
             </Typography>
-
-            {!smUp && (
-              <Typography variant="body2" sx={{ mt: 3, textAlign: 'center' }}>
-                Already have an account?{' '}
-                <Link variant="subtitle2" to="/login" component={RouterLink}>
-                  Login 
-                </Link>
-              </Typography>
-            )}
-          </ContentStyle>
-        </Container>
-      </RootStyle>
-    </Page>
+          )}
+        </ContentStyle>
+      </Container>
+    </RootStyle>
+  </Page>
+    </React.Fragment>
+    
   );
 }
