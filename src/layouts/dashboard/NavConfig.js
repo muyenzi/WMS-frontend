@@ -17,11 +17,7 @@ const navConfig = [
     path: '/dashboard/user',
     icon: getIcon('eva:people-fill'),
   },
-  {
-    title: 'product',
-    path: '/dashboard/products',
-    icon: getIcon('eva:shopping-bag-fill'),
-  },
+ 
   {
     title: 'Schools',
     path: '/dashboard/schools',
@@ -54,21 +50,7 @@ const navConfig = [
     path: '/dashboard/organizations',
     icon: getIcon('eva:file-text-fill'),
   },
-  {
-    title: 'Organizations',
-    path: '/dashboard/organizations',
-    icon: getIcon('eva:file-text-fill'),
-  },
-  {
-    title: 'login',
-    path: '/login',
-    icon: getIcon('eva:lock-fill'),
-  },
-  {
-    title: 'register',
-    path: '/register',
-    icon: getIcon('eva:person-add-fill'),
-  },
+
   {
     title: 'Not found',
     path: '/404',
