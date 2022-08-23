@@ -16,6 +16,7 @@ import NavSection from '../../components/NavSection';
 //
 import navConfig from './NavConfig';
 import navConfigAdmin from './NavConfigAdmin'
+import navConfigUser from './NavConfigUser';
 //import navConfigAdmin from './NavConfig';
 
 // ----------------------------------------------------------------------
@@ -126,6 +127,11 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
   {
     role=="SuperAdmin"?
     <NavSection navConfig={navConfig} />:null
+  }
+
+  {
+    role=="User"?
+    <NavSection navConfig={navConfigUser} />:null
   }
       
 

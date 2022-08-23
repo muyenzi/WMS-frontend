@@ -31,6 +31,9 @@ import React, {useEffect,useState} from "react";
 import {useSelector,useDispatch} from "react-redux";
 import { getDistrictsAction } from '../redux/actions/districtsAction';
 import { getProvincesAction } from '../redux/actions/provincesAction';
+import { getSectorsAction } from '../redux/actions/sectorsAction';
+import { getCellsAction } from '../redux/actions/cellsAction';
+import { getVillagesAction } from '../redux/actions/villagesAction';
 import { addSchoolAction } from '../redux/actions/addSchoolAction';
 import Collapse from "@mui/material/Collapse";
 import Alert from '@mui/material/Alert'
@@ -165,6 +168,9 @@ export default function DashboardApp() {
 const dispatch=useDispatch();
 const provinces=useSelector(state=>state.getProvinces)
 const districts=useSelector(state=>state.getDistricts)
+const sectors=useSelector(state=>state.getSectors)
+const cells=useSelector(state=>state.getCells)
+const villages=useSelector(state=>state.getVillages)
 const addSchool=useSelector(state=>state.addSchool);
 
 const [openSuccess, setOpenSuccess] = React.useState(false);

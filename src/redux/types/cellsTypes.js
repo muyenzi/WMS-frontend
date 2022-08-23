@@ -1,0 +1,3 @@
+export const CELLS_REQUEST = 'CELLS_REQUEST';
+export const CELLS_SUCCESS = 'CELLS_SUCCESS';
+export const CELLS_FAILURE = 'CELLS_FAILURE';
