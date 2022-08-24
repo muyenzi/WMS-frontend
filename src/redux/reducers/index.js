@@ -10,7 +10,8 @@ import sectorsReducer from "./sectorsReducer";
 import cellsReducer from "./cellsReducer";
 import villagesReducer from "./villagesReducer";
 import rejectedSchoolsReducer from "./rejectedSchoolsReducer";
-
+import schoolsReducer from "./schoolsReducer";
+import approvedSchoolsReducer from "./approvedSchoolsReducer";
 const allReducers = combineReducers({
     userLogin:loginReducer,
     getUsers:usersReducer,
@@ -23,6 +24,8 @@ const allReducers = combineReducers({
     getCells:cellsReducer,
     getVillages:villagesReducer,
     rejectedSchools:rejectedSchoolsReducer,
+    getSchools:schoolsReducer,
+    approvedSchools:approvedSchoolsReducer,
 });
 
 export default allReducers;

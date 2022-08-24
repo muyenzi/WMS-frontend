@@ -20,7 +20,7 @@ const navConfig = [
  
   {
     title: 'Schools',
-    path: '/dashboard/schools',
+    path: '/dashboard/schoolsapproved',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {

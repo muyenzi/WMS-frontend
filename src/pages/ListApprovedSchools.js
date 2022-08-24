@@ -3,8 +3,6 @@ import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
 import { useState,useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import ButtonGroup from '@mui/material/ButtonGroup';
-import Box from '@mui/material/Box';
 // material
 import {
   Card,
@@ -41,9 +39,15 @@ import { useDispatch,useSelector } from 'react-redux';
 // mock
 import USERLIST from '../_mock/user';
 
-import { getUsersAction } from "../redux/actions/getUsersAction"
-import { getSchoolsAction } from '../redux/actions/schoolsAction';
+import { getUsersAction } from "../redux/actions/getUsersAction";
+import { addUserAction } from 'src/redux/actions/addUserAction';
+import { getRejectedSchoolsAction } from '../redux/actions/rejectedSchoolsAction';
+import { getAprrovedSchoolsAction } from '../redux/actions/approvedSchoolsAction';
 
+import Collapse from "@mui/material/Collapse";
+import Alert from '@mui/material/Alert'
+import CloseIcon from '@mui/icons-material/Close';
+import {  IconButton} from '@mui/material';
 // ----------------------------------------------------------------------
 const roles=[{
   value:"SuperAdmin",
@@ -66,10 +70,9 @@ const roles=[{
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
   { id: 'source', label: 'Source', alignRight: false },
-  { id: 'howLong', label: 'How Long', alignRight: false },
+  { id: 'how_long', label: 'How Long', alignRight: false },
   { id: 'level', label: 'Level', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
-  { id: 'Action', label: 'Action', alignRight: false },
   { id: '' },
 ];
 
@@ -104,7 +107,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function School() {
+export default function ListApprovedSchools() {
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -115,28 +118,46 @@ export default function School() {
 
   const [filterName, setFilterName] = useState('');
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [open, setOpen] = React.useState(false);
+  const [openSuccess, setOpenSuccess] = React.useState(false);
   const [role, setRole] = React.useState('User');
-  const [usersDetails,setUsersDetails]=useState('')
-  const [schoolsDetails,setSchoolsDetails]=useState([])
+  const [fullname,setFullname]=useState('')
+  const [usersDetails,setUsersDetails]=useState([])
  const dispatch=useDispatch();
  const getAllUsers=useSelector(state=>state.getUsers);
- const getSchools=useSelector(state=>state.getSchools);
+ const addUser=useSelector(state=>state.addUser);
+ const rejectedSchools=useSelector(state=>state.rejectedSchools)
+ const approvedSchools=useSelector(state=>state.approvedSchools);
+ const [schoolsDetails,setSchoolsDetails]=useState([])
 
+const handleAddNewUser=async()=>{
+await dispatch(addUserAction({fullname,role},navigator))
+if(addUser.error){
+  setOpen(true)
+}
+if(addUser.users){
+  setOpenSuccess(true)
+}
+setFullname('')
+setRole('User')
+}
  useEffect(() => {
   async function fetchData() {
    // await dispatch(getUsersAction())
-    await dispatch(getSchoolsAction())
-    if (!getSchools.loading) {
-      if (getSchools.details) {
-        setSchoolsDetails(getSchools.details)
+    await dispatch(getRejectedSchoolsAction())
+    await dispatch(getAprrovedSchoolsAction())
+    if (!approvedSchools.loading) {
+      if (approvedSchools.details) {
+        setSchoolsDetails(approvedSchools.details)
       }
     }
   }
   fetchData();
-}, [!getSchools.details]);
+}, [approvedSchools.details]);
   const handleChange = (event) => {
     setRole(event.target.value);
+    setFullname(event.target.value);
   };
 
   const handleClickOpen = () => {
@@ -145,6 +166,7 @@ export default function School() {
 
   const handleClose = () => {
     setOpen(false);
+    setOpenSuccess(false)
   };
 
 
@@ -156,7 +178,7 @@ export default function School() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = schoolsDetails.map((n) => n.name);
+      const newSelecteds = usersDetails.map((n) => n.fullname);
       setSelected(newSelecteds);
       return;
     }
@@ -196,22 +218,20 @@ export default function School() {
   const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
 
   const isUserNotFound = filteredUsers.length === 0;
-
   return (
-    <>
+    <React.Fragment>
      <Page title="User">
       <Container>
+      
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Schools
+            List of Approved Schools
           </Typography>
-          {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
-            New User
-          </Button> */}
+          
         </Stack>
 
         <Card>
-        
+          
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -229,7 +249,7 @@ export default function School() {
                   {schoolsDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     const { id, name, role, status, company, avatarUrl} = row;
                     const isItemSelected = selected.indexOf(name) !== -1;
-
+                    console.log("lllly g",usersDetails)
                     return (
                    
                       <TableRow
@@ -240,47 +260,33 @@ export default function School() {
                         selected={isItemSelected}
                         aria-checked={isItemSelected}
                       >
-                        <TableCell padding="checkbox">
-                          <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} />
-                        </TableCell>
-                        <TableCell component="th" scope="row" padding="none">
-                          <Stack direction="row" alignItems="center" spacing={2}>
-                           
-                            <Typography variant="subtitle2" noWrap>
-                              {row.name}
-                            </Typography>
-                          </Stack>
-                        </TableCell>
-                        <TableCell align="left">{row.source}</TableCell>
-                        <TableCell align="left">{row.how_long}</TableCell>
-                        <TableCell align="left">{row.level}</TableCell>
-                        {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
-                        <TableCell align="left">
-                          <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
-                           {row.status}
-                          </Label>
-                        </TableCell>
-                        <TableCell align="center">
-                        <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        '& > *': {
-          m: 1,
-        },
-      }}
-    >
-    
-      <ButtonGroup variant="text" aria-label="text button group">
-        <Button>Approve</Button>
-        <Button>Reject</Button>
-      </ButtonGroup>
-    </Box>
-                        </TableCell>
-                        <TableCell align="right">
-                          <UserMoreMenu />
-                        </TableCell>
+                      <TableCell padding="checkbox">
+                      <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, fullname)} />
+                    </TableCell>
+
+                      <TableCell component="th" scope="row" padding="none">
+                      <Stack direction="row" alignItems="center" spacing={2}>
+                       
+                        <Typography variant="subtitle2" noWrap>
+                          {row.name}
+                        </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell align="left">{row.source}</TableCell>
+                    <TableCell align="left">{row.how_long}</TableCell>
+                    <TableCell align="left">{row.level}</TableCell>
+                    {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
+                    <TableCell align="left">
+                    
+                      <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
+                       {row.status}
+                      </Label>
+                      
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <UserMoreMenu />
+                    </TableCell>
                       </TableRow>
                     );
                   })}
@@ -316,58 +322,9 @@ export default function School() {
         </Card>
       </Container>
     </Page>
-    <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>user information</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            please provide user unformation. We
-            will send updates occasionally.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="FullNames"
-            label="Full Names"
-            type="text"
-            fullWidth
-            variant="standard"
-          />
-           <TextField
-            autoFocus
-            margin="dense"
-            id="email"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-            <TextField
-          id="outlined-select-currency-native"
-          select
-          label="Native select"
-          value={role}
-          fullWidth
-          variant="standard"
-          onChange={handleChange}
-          SelectProps={{
-            native: true,
-          }}
-          helperText="Please select the Role"
-        >
-          {roles.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
-        </DialogActions>
-      </Dialog>
+    
 
-    </>
+    </React.Fragment>
    
   );
 }
