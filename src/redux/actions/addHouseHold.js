@@ -22,8 +22,10 @@ export const addHouseHoldAction = (details,navigate) => async (dispatch) => {
     source:householdSource,
     frequency:householdFrequency,
     how_long:householdHowLong,
-    prov_name:provinceName,
-    dis_name:districtName
+    prov_name:"Kigali",
+    dis_name:"Gasabo",
+    // prov_name:provinceName,
+    // dis_name:districtName
    });
     const {data} = await res;
    console.log(data)

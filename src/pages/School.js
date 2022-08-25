@@ -137,8 +137,12 @@ export default function School() {
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
  const [openFeedBack,setOpenFeedBack]=useState(false)
+const [schoolId,setSchoolId]=useState('')
+const [textMessage,setTextMessage]=useState('');
 
+const [errorMessage,setErrorMessage]=useState('')
  const handleFeedBack=(id)=>{
+  setSchoolId(id)
   setOpenFeedBack(true)
  }
 
@@ -163,6 +167,23 @@ const handleRejectSchool=async(id)=>{
     console.log(error);
   });
   }
+  const handleSentMessage=async(id)=>{
+    const url=`http://localhost:8000/api/messages`
+    await axios.post(url, {
+      message:textMessage,
+      ref_id:schoolId
+    })
+     .then(function (response) {
+       console.log(response.data);
+        setErrorMessage(response.data.message)
+       
+     
+     })
+     .catch(function (error) {
+      setErrorMessage(error.response.data.message)
+       console.log(error.response.data.message);
+     });
+  }
  useEffect(() => {
   async function fetchData() {
    // await dispatch(getUsersAction())
@@ -183,6 +204,8 @@ const handleRejectSchool=async(id)=>{
   const handleClose = () => {
     setOpen(false);
     setOpenFeedBack(false)
+    setErrorMessage('')
+    setTextMessage('')
   };
 
 
@@ -239,6 +262,14 @@ const handleRejectSchool=async(id)=>{
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
     <DialogTitle>Provide feedbak</DialogTitle>
+    {
+      errorMessage? 
+      <Typography> 
+      {errorMessage}
+    </Typography>
+    :null
+    }
+    
     <Box
     component="form"
     sx={{
@@ -252,7 +283,10 @@ const handleRejectSchool=async(id)=>{
       <TextField
         id="outlined-multiline-static"
         label="Type Message"
+        name="textMessage"
+        value={textMessage}
         multiline
+        onChange={(e)=>setTextMessage(e.target.value)}
         rows={4}
         defaultValue="Message..."
       />
@@ -260,7 +294,7 @@ const handleRejectSchool=async(id)=>{
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
                   <Button onClick={handleClose} >Cancel</Button>
-                  <Button >Send</Button>
+                  <Button onClick={handleSentMessage}>Send</Button>
                  
                 </ButtonGroup>
   </Dialog>

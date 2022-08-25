@@ -24,8 +24,10 @@ export const addSchoolAction = (details,navigate) => async (dispatch) => {
     frequency:schoolFrequency,
     how_long:schoolHowLong,
     level:schoolLevel,
-    prov_name:provinceName,
-    dis_name:districtName
+    prov_name:"Kigali",
+    dis_name:"Gasabo",
+    // prov_name:provinceName,
+    // dis_name:districtName
    });
     const {data} = await res;
    console.log(data)

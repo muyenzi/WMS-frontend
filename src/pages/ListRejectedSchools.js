@@ -137,9 +137,23 @@ export default function School() {
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
  const [openFeedBack,setOpenFeedBack]=useState(false)
-
- const handleFeedBack=(id)=>{
+const  [schoolId,setSchoolId]=useState('')
+const [textMessage,setTextMessage]=useState('')
+ const handleFeedBack=async(id)=>{
+  const url=`http://localhost:8000/api/messages/${id}`
+  await axios.get(url)
+  .then(function (response) {
+    console.log(response.data);
+    setTextMessage(response.data.data.message)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
   setOpenFeedBack(true)
+ }
+
+ const handleGetMessage=async()=>{
+  
  }
 
 
@@ -248,14 +262,13 @@ const handleRejectSchool=(id)=>{
     autoComplete="off"
   >
     <div>
-    
-      <TextField
-        id="outlined-multiline-static"
-        label="Type Message"
-        multiline
-        rows={4}
-        defaultValue="Message..."
-      />
+    {
+      textMessage?
+      <Typography>
+      {textMessage}
+     </Typography>:null
+    }
+   
     </div>
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
