@@ -35,11 +35,14 @@ import { getSectorsAction } from '../redux/actions/sectorsAction';
 import { getCellsAction } from '../redux/actions/cellsAction';
 import { getVillagesAction } from '../redux/actions/villagesAction';
 import { addSchoolAction } from '../redux/actions/addSchoolAction';
+import { addHouseHoldAction } from '../redux/actions/addHouseHold';
 import Collapse from "@mui/material/Collapse";
 import Alert from '@mui/material/Alert'
 import CloseIcon from '@mui/icons-material/Close';
 import {  IconButton} from '@mui/material';
-const schoolsSources=[
+import axios from "axios"
+
+const schoolsLevels =[
   {
   values:"Pre-primary",
   label:"Pre-primary",
@@ -75,7 +78,7 @@ const schoolsHowLong=[
 
 ]
 
-const schoolsLevels=[
+const schoolsFrequencies=[
   {
   value:"Yes",
   label:"Yes",
@@ -88,7 +91,7 @@ const schoolsLevels=[
 ]
 
 
-const schoolsFrequencies=[
+const schoolsSources =[
   {
   values:"Piped water supply inside the school building ",
   label:"Piped water supply inside the school building ",
@@ -153,7 +156,7 @@ const householdFrequencies=[
 }
 ]
 
-const householdHowLong=[
+const householdHowLongs=[
   {
   values:"Less than 30 minutes round trip",
   label:"Less than 30 minutes round trip",
@@ -172,7 +175,7 @@ const sectors=useSelector(state=>state.getSectors)
 const cells=useSelector(state=>state.getCells)
 const villages=useSelector(state=>state.getVillages)
 const addSchool=useSelector(state=>state.addSchool);
-
+const addHouseHold=useSelector(state=>state.addHouseHold);
 const [openSuccess, setOpenSuccess] = React.useState(false);
 const [open, setOpen] = React.useState(false);
   const [role,setRole]=useState('')
@@ -189,8 +192,13 @@ const [open, setOpen] = React.useState(false);
   const [schoolFrequency,setSchoolFrequency]=useState('')
   const [schoolHowLong,setSchoolHowLong]=useState('');
   const [schoolLevel,setSchoolLevel]=useState('')
-
-  console.log("district data:::",districtData)
+  //houseHold
+  const [householdPhone,setHouseholdPhone]=useState('')
+  const [householdSource,setHouseholdSource]=useState('')
+  const [householdFrequency,setHouseholdFrequency]=useState('')
+  const [householdHowLong,setHouseholdHowLong]=useState('');
+  const [totalNumberOfSchool,setTotalNumberOfSchool]=useState('')
+  const [totalNumberOfHouseHold,setTotalNumberOfHouseHold]=useState('')
   useEffect(() => {
     const auth=localStorage.getItem("wmsAuth")
     const userAuth=localStorage.getItem("userAuth")
@@ -213,6 +221,18 @@ const [open, setOpen] = React.useState(false);
       }
     })
   }
+  const handleSaveHouseHold=async()=>{
+    
+    console.log("data..kkk..ll..",provinceName,districtName ,householdPhone,householdSource,householdFrequency,householdHowLong)
+  await dispatch(addHouseHoldAction({provinceName,districtName ,householdPhone,householdSource,householdFrequency,householdHowLong}))
+  if(addSchool.error){
+    setOpen(true)
+  }
+  if(addHouseHold.details){
+    setOpenSuccess(true)
+  }
+
+}
   
   const handleSaveSchool=async()=>{
     
@@ -227,15 +247,38 @@ const [open, setOpen] = React.useState(false);
 
 }
   const handleDistrict=async()=>{
-   
 
   }
+  useEffect(()=>{
+    async function fetchSchoolData() {
+      const url=`http://localhost:8000/api/schools/`
+      await axios.get(url)
+      .then(function (response) {
+        console.log(response.data);
+        setTotalNumberOfSchool(response.data.data.length)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
+    async function fetchHouseHoldData() {
+      const url=`http://localhost:8000/api/households/`
+      await axios.get(url)
+      .then(function (response) {
+        console.log(response.data);
+        setTotalNumberOfHouseHold(response.data.data.length)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
+    fetchHouseHoldData() 
+    fetchSchoolData();
+  },[])
  
   useEffect(() => {
     async function fetchData() {
-    
       await dispatch(getProvincesAction())
-     
       if (!provinces.loading) {
         if (provinces.details) {
           setProvincesData(provinces.details)
@@ -494,19 +537,115 @@ const [open, setOpen] = React.useState(false);
           please provide Household unformation. We
           will send updates occasionally.
         </DialogContentText>
+        {
+          !addHouseHold.error? null:
+           <Collapse in={open}>
+           <Alert
+           severity="error"
+             action={
+               <IconButton
+                 aria-label="close"
+                 color="inherit"
+                 size="small"
+                 onClick={handleClose}
+               
+               >
+                 <CloseIcon fontSize="inherit" />
+               </IconButton>
+             }
+             sx={{ mb: 0.2 }}
+           >
+            {addHouseHold.error}
+           </Alert>
+         </Collapse>
+        }    
+        {
+          addHouseHold.details? <Collapse in={openSuccess}>
+          <Alert
+          severity="success"
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={handleClose}
+              
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            sx={{ mb: 0.2 }}
+          >
+           {addHouseHold.details}
+          </Alert>
+        </Collapse>:null
+        }
+       
         <TextField
           autoFocus
           margin="dense"
-          id="household"
-          name="phone"
-         // onChange={(e)=>setFullname(e.target.value)}
-          //value={fullname}
+          id="householdPhone"
+          name="householdPhone"
+         onChange={(e)=>setHouseholdPhone(e.target.value)}
+          value={householdPhone}
           label="Phone Number"
           required
           type="text"
           fullWidth
           variant="standard"
         />
+        <TextField
+        id="outlined-select-currency-native"
+        select
+        label="Select "
+       // value={role}
+       // name="role"
+        fullWidth
+        required
+        variant="standard"
+        onChange={(e)=>handleOnChange(e)
+          }
+       onKeyPress={handleDistrict}
+        SelectProps={{
+          native: true,
+        }} 
+      >
+        {provinces.details.map((option) => (
+          <option key={option.id} value={option.id}  >
+          
+            {option.Provinces}
+          </option>
+        ))}
+      </TextField>
+      {
+        !districts.details.length?null:
+        <TextField
+        id="outlined-select-currency-native"
+        select
+        label="Select "
+       // value={role}
+       // name="role"
+        fullWidth
+        required
+        variant="standard"
+        onChange={(e)=>handleOnChange(e)
+          }
+       onKeyPress={handleDistrict}
+        SelectProps={{
+          native: true,
+        }} 
+      >
+        {districts.details.map((option) => (
+          <option key={option.id} value={option.id}  >
+          
+            {option.Districts}
+          </option>
+        ))}
+      </TextField>
+
+       }
+     
+
         <Typography variant="h6" gutterBottom>
           	1.	Where did the household collect water in the past 6 months?
          </Typography>
@@ -514,12 +653,12 @@ const [open, setOpen] = React.useState(false);
         id="outlined-select-currency-native"
         select
         label="Select "
-       // value={role}
-        name="role"
+       value={householdSource}
+        name="householdSource"
         fullWidth
         required
         variant="standard"
-      //  onChange={(e)=>setRole(e.target.value)}
+       onChange={(e)=>setHouseholdSource(e.target.value)}
         SelectProps={{
           native: true,
         }}
@@ -538,13 +677,13 @@ const [open, setOpen] = React.useState(false);
       <TextField
     id="outlined-select-currency-native"
     select
-    label="Select "
-   // value={role}
-    name="role"
+    label="Select..."
+   value={householdFrequency}
+    name="householdFrequency"
     fullWidth
     required
     variant="standard"
-  //  onChange={(e)=>setRole(e.target.value)}
+    onChange={(e)=>setHouseholdFrequency(e.target.value)}
     SelectProps={{
       native: true,
     }}
@@ -565,18 +704,18 @@ const [open, setOpen] = React.useState(false);
 id="outlined-select-currency-native"
 select
 label="Select "
-// value={role}
-name="role"
+ value={householdHowLong}
+name="householdHowLong"
 fullWidth
 required
 variant="standard"
-//  onChange={(e)=>setRole(e.target.value)}
+onChange={(e)=>setHouseholdHowLong(e.target.value)}
 SelectProps={{
   native: true,
 }}
 
 >
-{householdHowLong.map((option) => (
+{householdHowLongs.map((option) => (
   <option key={option.value} value={option.value}>
     {option.label}
   </option>
@@ -586,8 +725,8 @@ SelectProps={{
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button >
-       Save
+        <Button onClick={handleSaveHouseHold} >
+        {addHouseHold.loading?"loading":"Save"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -661,18 +800,18 @@ SelectProps={{
           role==="SuperAdmin" || role=="Admin" ?
           <React.Fragment>
           <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Organizations" total={714000} icon={'ant-design:android-filled'} />
+          <AppWidgetSummary title="HouseHolds" total={totalNumberOfHouseHold}  />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Health Facilities" total={1352831} color="info" icon={'ant-design:apple-filled'} />
-        </Grid>
-
-        <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Pabluci Place" total={1723315} color="warning" icon={'ant-design:windows-filled'} />
+          <AppWidgetSummary title="Schools" total={totalNumberOfSchool} color="info" />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Schools" total={234} color="error" icon={'ant-design:bug-filled'} />
+          <AppWidgetSummary title="Pabluci Place" total={17} color="warning" />
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <AppWidgetSummary title="Health Facilities" total={2} color="error"  />
         </Grid>
 
           </React.Fragment>

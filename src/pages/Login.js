@@ -83,9 +83,9 @@ export default function Login() {
         {mdUp && (
           <SectionStyle>
             <Typography variant="h3" sx={{ px: 5, mt: 2, mb: 5 }}>
-              Water Management System
+              Water Monitoring System
             </Typography>
-            <img src="/static/images/backgroundimage.jpeg" alt="login" />
+            <img src="/static/images/welcome.webp" alt="login" />
           </SectionStyle>
         )}
 

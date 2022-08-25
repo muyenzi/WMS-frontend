@@ -1,0 +1,104 @@
+<Card>
+        
+
+    <Scrollbar>
+      <TableContainer sx={{ minWidth: 800 }}>
+        <Table>
+          <UserListHead
+            order={order}
+            orderBy={orderBy}
+            headLabel={TABLE_HEAD}
+            rowCount={schoolsDetails.length}
+            numSelected={selected.length}
+            onRequestSort={handleRequestSort}
+            onSelectAllClick={handleSelectAllClick}
+          />
+          <TableBody>
+            {schoolsDetails.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+              const { id, name, role, status, company, avatarUrl} = row;
+              const isItemSelected = selected.indexOf(name) !== -1;
+
+              return (
+             
+                <TableRow
+                  hover
+                  key={row.id}
+                  tabIndex={-1}
+                  role="checkbox"
+                  selected={row.id}
+                  aria-checked={isItemSelected}
+                >
+                  <TableCell padding="checkbox">
+                    <Checkbox checked={isItemSelected} onChange={(event) => handleClick(event, name)} />
+                  </TableCell>
+                  <TableCell component="th" scope="row" padding="none">
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                     
+                      <Typography variant="subtitle2" noWrap>
+                        {row.name}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell align="left">{row.source}</TableCell>
+                  <TableCell align="left">{row.how_long}</TableCell>
+                  <TableCell align="left">{row.level}</TableCell>
+                  {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
+                  <TableCell align="left">
+                    <Label variant="ghost" color={(status === 'banned' && 'error') || 'success'}>
+                     {row.status}
+                    </Label>
+                  </TableCell>
+                  <TableCell align="center">
+                  <Box
+sx={{
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  '& > *': {
+    m: 1,
+  },
+}}
+>
+
+<ButtonGroup variant="text" aria-label="text button group">
+  <Button onClick={handleAproveSchool(row.id)}>Approve</Button>
+  <Button>Reject</Button>
+</ButtonGroup>
+</Box>
+                  </TableCell>
+                  <TableCell align="right">
+                    <UserMoreMenu />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+
+          {isUserNotFound && (
+            <TableBody>
+              <TableRow>
+                <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                  <SearchNotFound searchQuery={filterName} />
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          )}
+        </Table>
+      </TableContainer>
+    </Scrollbar>
+
+    <TablePagination
+      rowsPerPageOptions={[5, 10, 25]}
+      component="div"
+      count={USERLIST.length}
+      rowsPerPage={rowsPerPage}
+      page={page}
+      onPageChange={handleChangePage}
+      onRowsPerPageChange={handleChangeRowsPerPage}
+    />
+  </Card>

@@ -12,6 +12,9 @@ import villagesReducer from "./villagesReducer";
 import rejectedSchoolsReducer from "./rejectedSchoolsReducer";
 import schoolsReducer from "./schoolsReducer";
 import approvedSchoolsReducer from "./approvedSchoolsReducer";
+import addHouseHoldReducer from "./addHouseHoldReducer";
+import getHouseHoldReducer from "./houseHoldReducer";
+
 const allReducers = combineReducers({
     userLogin:loginReducer,
     getUsers:usersReducer,
@@ -26,6 +29,8 @@ const allReducers = combineReducers({
     rejectedSchools:rejectedSchoolsReducer,
     getSchools:schoolsReducer,
     approvedSchools:approvedSchoolsReducer,
+    addHouseHold:addHouseHoldReducer,
+    getHouseHolds:getHouseHoldReducer,
 });
 
 export default allReducers;

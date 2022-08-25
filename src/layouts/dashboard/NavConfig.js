@@ -24,16 +24,16 @@ const navConfig = [
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {
+    title: 'HouseHolds',
+    path: '/dashboard/householdsapproved',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
+  {
     title: 'Organizations',
     path: '/dashboard/organizations',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
-  {
-    title: 'House Holds',
-    path: '/dashboard/households',
-    icon: getIcon('eva:pie-chart-2-fill'),
-  },
-
+ 
   {
     title: 'permission',
     path: '/dashboard/user',

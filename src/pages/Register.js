@@ -83,9 +83,9 @@ export default function Register() {
       {mdUp && (
         <SectionStyle>
           <Typography variant="h3" sx={{ px: 5, mt: 2, mb: 5 }}>
-          Water Management System
+          Water Monitoring System
           </Typography>
-          <img src="/static/images/backgroundimage.jpeg" alt="login" />
+          <img src="/static/images/welcome.webp" alt="login" />
         </SectionStyle>
       )}
 
@@ -95,7 +95,7 @@ export default function Register() {
             Enroll Your Self
           </Typography>
 
-          <Typography sx={{ color: 'text.secondary', mb: 5 }}>Free forever. No credit card needed.</Typography>
+          <Typography sx={{ color: 'text.secondary', mb: 5 }}></Typography>
 
           <RegisterForm />
           {!smUp && (

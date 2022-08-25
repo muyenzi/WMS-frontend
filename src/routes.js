@@ -15,7 +15,8 @@ import Organization from './pages/Organization';
 import ListRejectedSchools from './pages/ListRejectedSchools';
 import ListRejectedHouseHolds from './pages/ListRejectedHouseHold';
 import ListApprovedSchools from './pages/ListApprovedSchools';
-
+import ListApprovedHouseHold from './pages/ListApprovedHouseHold';
+import HouseHolds from "./pages/HouseHolds"
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -27,10 +28,13 @@ export default function Router() {
         { path: 'app', element: <DashboardApp /> },
         { path: 'user', element: <User /> },
         { path: 'schools', element: <School /> },
+        { path: 'households', element: <HouseHolds /> },
+        { path: 'householdsapproved', element: <ListApprovedHouseHold /> },
         { path: 'organizations', element: <Organization /> },
         { path: 'products', element: <Products /> },
         { path: 'schoolsrejected', element: <ListRejectedSchools /> },
         { path: 'householdsrejected', element: <ListRejectedHouseHolds /> },
+        
         { path: 'schoolsapproved', element: <ListApprovedSchools /> },
         { path: 'blog', element: <Blog /> },
       ],
