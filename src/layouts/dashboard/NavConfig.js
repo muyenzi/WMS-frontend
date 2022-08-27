@@ -28,17 +28,9 @@ const navConfig = [
     path: '/dashboard/householdsapproved',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
-  {
-    title: 'Organizations',
-    path: '/dashboard/organizations',
-    icon: getIcon('eva:pie-chart-2-fill'),
-  },
  
-  {
-    title: 'permission',
-    path: '/dashboard/user',
-    icon: getIcon('eva:people-fill'),
-  },
+ 
+ 
   {
     title: 'data collection',
     path: '/dashboard/user',
@@ -50,11 +42,10 @@ const navConfig = [
     path: '/dashboard/organizations',
     icon: getIcon('eva:file-text-fill'),
   },
-
   {
-    title: 'Not found',
+    title: '',
     path: '/404',
-    icon: getIcon('eva:alert-triangle-fill'),
+    icon: ""
   },
 ];
 

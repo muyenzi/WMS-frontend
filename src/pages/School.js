@@ -361,7 +361,9 @@ const handleRejectSchool=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-                <TableCell align="center">{details.name}</TableCell>
+              {details.status==="Pending"?
+            <React.Fragment>
+            <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
@@ -397,6 +399,11 @@ const handleRejectSchool=async(id)=>{
       
               
                 </TableCell>
+            </React.Fragment>:
+            null
+            
+            }
+                
               </TableRow>
               ))}
               </React.Fragment>
@@ -408,40 +415,49 @@ const handleRejectSchool=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-                <TableCell align="center">{details.name}</TableCell>
-                <TableCell component="th" scope="row">
-                  {details.source}
-                </TableCell>
-               
-                <TableCell align="center">{details.how_long}</TableCell>
-                <TableCell align="center">{details.level}</TableCell>
-                <TableCell align="center">{details.status}</TableCell>
-                <TableCell align="center">
-
-                <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  '& > *': {
-                    m: 1,
-                  },
-                }}
-                >
+              {details.status==="Pending"?
+              <React.Fragment>
+              <TableCell align="center">{details.name}</TableCell>
+                  <TableCell component="th" scope="row">
+                    {details.source}
+                  </TableCell>
+                 
+                  <TableCell align="center">{details.how_long}</TableCell>
+                  <TableCell align="center">{details.level}</TableCell>
+                  <TableCell align="center">{details.status}</TableCell>
+                  <TableCell align="center">
+  
+                  <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    '& > *': {
+                      m: 1,
+                    },
+                  }}
+                  >
+                  
+                  <ButtonGroup variant="text" aria-label="text button group">
+                    <Button onClick={async()=>{
+                      handleAproveSchool(details.id)
+                     }}>Approve</Button>
+                    <Button onClick={()=>{
+                      handleRejectSchool(details.id)
+                    }}>Reject</Button>
+                    <Button onClick={()=>{
+                      handleFeedBack(details.id)
+                    }}>Feed Back</Button>
+                  </ButtonGroup>
+                  </Box>
+        
                 
-                <ButtonGroup variant="text" aria-label="text button group">
-                  <Button onClick={async()=>{
-                    handleAproveSchool(details.id)
-                   }}>Approve</Button>
-                  <Button onClick={()=>{
-                    handleRejectSchool(details.id)
-                  }}>Reject</Button>
-                  <Button onClick={()=>{
-                    handleFeedBack(details.id)
-                  }}>Feed Back</Button>
-                </ButtonGroup>
-                </Box>
-                </TableCell>
+                  </TableCell>
+              </React.Fragment>:
+              null
+              
+              }
+                  
               </TableRow>
               ))}
               </React.Fragment>

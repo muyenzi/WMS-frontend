@@ -269,12 +269,14 @@ const handleRejectSchool=(id)=>{
           <Typography variant="h4" gutterBottom>
             List of Aproved Schools
           </Typography>
+          
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
           </Button> */}
         </Stack>
 
         <TableContainer component={Paper}>
+        
         <Box sx={{ maxWidth: 400, position:"center", display:"flex"}}>
         <TextField
           fullWidth
@@ -291,6 +293,22 @@ const handleRejectSchool=(id)=>{
           placeholder="Search ..."
           variant="outlined"
         />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            '& > *': {
+              m: 1,
+            },
+          }}
+          >
+          
+          <ButtonGroup variant="text" aria-label="text button group">
+            
+            <Button >Print</Button>
+          </ButtonGroup>
+          </Box>
 
   </Box>
         <Table aria-label="caption table">
@@ -312,7 +330,7 @@ const handleRejectSchool=(id)=>{
               <TableCell align="center">Distance</TableCell>
               <TableCell align="center">Level</TableCell>
               <TableCell align="center">Status</TableCell>
-              <TableCell align="center">ACTION</TableCell>
+              
             </TableRow>
           </TableHead>
           <TableBody>
@@ -338,24 +356,7 @@ const handleRejectSchool=(id)=>{
                 <TableCell align="center">{details.status}</TableCell>
                 <TableCell align="center">
 
-                <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  '& > *': {
-                    m: 1,
-                  },
-                }}
-                >
-                
-                <ButtonGroup variant="text" aria-label="text button group">
-                  
-                  <Button onClick={()=>{
-                    handleFeedBack(details.id)
-                  }}>Message</Button>
-                </ButtonGroup>
-                </Box>
+               
       
               
                 </TableCell>
@@ -388,24 +389,7 @@ const handleRejectSchool=(id)=>{
             <TableCell align="center">{details.status}</TableCell>
             <TableCell align="center">
 
-            <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              '& > *': {
-                m: 1,
-              },
-            }}
-            >
-            
-            <ButtonGroup variant="text" aria-label="text button group">
-              
-              <Button onClick={()=>{
-                handleFeedBack(details.id)
-              }}>Message</Button>
-            </ButtonGroup>
-            </Box>
+           
             </TableCell>
             </React.Fragment>:null
             }

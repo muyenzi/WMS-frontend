@@ -31,14 +31,19 @@ const navConfigAdmin = [
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {
+    title: 'Health Facilities',
+    path: '/dashboard/healthfacilities',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
+  {
     title: 'Organizations',
     path: '/dashboard/organizations',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {
-    title: 'Not found',
+    title: '',
     path: '/404',
-    icon: getIcon('eva:alert-triangle-fill'),
+    icon: '',
   },
  
   

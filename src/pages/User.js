@@ -377,7 +377,7 @@ setRole('User')
             name="fullname"
             onChange={(e)=>setFullname(e.target.value)}
             value={fullname}
-            label="Full Name"
+            label="Email"
             required
             type="text"
             fullWidth

@@ -47,8 +47,7 @@ import USERLIST from '../_mock/user';
 
 import { getUsersAction } from "../redux/actions/getUsersAction"
 import { getSchoolsAction } from '../redux/actions/schoolsAction';
-import { getHouseholdsAction } from '../redux/actions/houseHoldAction';
-
+import { getHealthfacilitiesAction } from '../redux/actions/healthfacilitiesAction';
 // ----------------------------------------------------------------------
 const roles=[{
   value:"SuperAdmin",
@@ -110,6 +109,11 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function School() {
+  const [value, setValue] = React.useState('Controlled');
+
+  const handleChangeA = (event) => {
+    setValue(event.target.value);
+  };
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -123,61 +127,95 @@ export default function School() {
   const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
   const [role, setRole] = React.useState('User');
   const [usersDetails,setUsersDetails]=useState('')
-  const [ houseHoldsDetails, setHouseHoldsDetails]=useState([])
+  const [schoolsDetails,setSchoolsDetails]=useState([])
  const dispatch=useDispatch();
  const getAllUsers=useSelector((state)=>state.getUsers);
  const getSchools=useSelector((state)=>state.getSchools);
- const getHouseHolds=useSelector((state)=>state.getHouseHolds)
- const [openFeedBack,setOpenFeedBack]=useState(false)
+ const getHealthfacilities=useSelector((state)=>state.getHealthfacilities)
+
  const [limit, setLimit] = useState(5);
  const [selectedExamIds, setSelectedExamIds] = useState([]);
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
+ const [openFeedBack,setOpenFeedBack]=useState(false)
+const [schoolId,setSchoolId]=useState('')
+const [textMessage,setTextMessage]=useState('');
 
+const {healthfacilitiesData,setHealthfacilitiesData}=useState('')
+const [errorMessage,setErrorMessage]=useState('')
  const handleFeedBack=(id)=>{
-    setOpenFeedBack(true)
-   }
-  
-const handleAproveHouseHold=(id)=>{
-const url=`http://localhost:8000/api/households/approve-household/${id}`
-axios.put(url, {})
-.then(function (response) {
-  console.log(response.data);
-})
-.catch(function (error) {
-  console.log(error);
-});
-}
-const handleRejectHouseHold=(id)=>{
-  const url=`http://localhost:8000/api/households/reject-household/${id}`
-  axios.put(url, {})
-  .then(function (response) {
-    console.log(response.data);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
+  setSchoolId(id)
+  setOpenFeedBack(true)
+ }
+
+
+
+const handleAproveHealthFacility=async(id)=>{
+    const url=`http://localhost:8000/api/healthfacilities/approvehealthfacility/${id}`
+    await axios.put(url, {})
+    .then(function (response) {
+      console.log(response.data);
+       dispatch(getHealthfacilitiesAction())
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    }
+
+    const handleRejectHealthfacility=async(id)=>{
+        const url=`http://localhost:8000/api/healthfacilities/rejecthealthfacility/${id}`
+       await axios.put(url, {})
+        .then(function (response) {
+          console.log(response.data);
+          dispatch(getHealthfacilitiesAction())
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+        }
+    
+
+  const handleSentMessage=async(id)=>{
+    const url=`http://localhost:8000/api/messages`
+    await axios.post(url, {
+      message:textMessage,
+      ref_id:schoolId
+    })
+     .then(function (response) {
+       console.log(response.data);
+        setErrorMessage(response.data.message)
+       
+     
+     })
+     .catch(function (error) {
+      setErrorMessage(error.response.data.message)
+       console.log(error.response.data.message);
+     });
   }
+  console.log(',,,,',getHealthfacilities.details)
  useEffect(() => {
   async function fetchData() {
    // await dispatch(getUsersAction())
-    await dispatch(getHouseholdsAction())
-    if (!getHouseHolds.loading) {
-      if (getHouseHolds.details) {
-        setHouseHoldsDetails(getHouseHolds.details)
+    await dispatch(getHealthfacilitiesAction())
+    if (!getHealthfacilities.loading) {
+      if (getHealthfacilities.details) {
+        setHealthfacilitiesData(getHealthfacilities.details)
       }
     }
   }
   fetchData();
-}, [getHouseHolds.details]);
+}, [!getHealthfacilities.details]);
   const handleChange = (event) => {
     setRole(event.target.value);
   };
-
+  console.log("res[pponse data",healthfacilitiesData)
+ 
 
   const handleClose = () => {
     setOpen(false);
     setOpenFeedBack(false)
+    setErrorMessage('')
+    setTextMessage('')
   };
 
 
@@ -209,15 +247,15 @@ const handleRejectHouseHold=(id)=>{
     try {
       var results = [];
       const toSearch = trimString(searchKey); // trim it
-      for (var i = 0; i < houseHoldsDetails.length; i++) {
-        for (var key in houseHoldsDetails[i]) {
-          if (houseHoldsDetails[i][key] != null) {
+      for (var i = 0; i < healthfacilitiesData.length; i++) {
+        for (var key in healthfacilitiesData[i]) {
+          if (healthfacilitiesData[i][key] != null) {
             if (
-                houseHoldsDetails[i][key].toString().toLowerCase().indexOf(toSearch) !=
+              healthfacilitiesData[i][key].toString().toLowerCase().indexOf(toSearch) !=
               -1
             ) {
-              if (!itemExists(results, houseHoldsDetails[i]))
-                results.push(houseHoldsDetails[i]);
+              if (!itemExists(results, healthfacilitiesData[i]))
+                results.push(healthfacilitiesData[i]);
             }
           }
         }
@@ -234,6 +272,14 @@ const handleRejectHouseHold=(id)=>{
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
     <DialogTitle>Provide feedbak</DialogTitle>
+    {
+      errorMessage? 
+      <Typography> 
+      {errorMessage}
+    </Typography>
+    :null
+    }
+    
     <Box
     component="form"
     sx={{
@@ -247,15 +293,18 @@ const handleRejectHouseHold=(id)=>{
       <TextField
         id="outlined-multiline-static"
         label="Type Message"
+        name="textMessage"
+        value={textMessage}
         multiline
+        onChange={(e)=>setTextMessage(e.target.value)}
         rows={4}
         defaultValue="Message..."
       />
     </div>
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
-                  <Button onClick={handleClose} >Close</Button>
-              
+                  <Button onClick={handleClose} >Cancel</Button>
+                  <Button onClick={handleSentMessage}>Send</Button>
                  
                 </ButtonGroup>
   </Dialog>
@@ -263,7 +312,7 @@ const handleRejectHouseHold=(id)=>{
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-          List of Approved   HouseHold
+            Health Facilities
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
@@ -287,26 +336,10 @@ const handleRejectHouseHold=(id)=>{
           placeholder="Search ..."
           variant="outlined"
         />
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            '& > *': {
-              m: 1,
-            },
-          }}
-          >
-          
-          <ButtonGroup variant="text" aria-label="text button group">
-            
-            <Button >Print</Button>
-          </ButtonGroup>
-          </Box>
 
   </Box>
         <Table aria-label="caption table">
-          <caption className="textTitle">Household List</caption>
+          <caption className="textTitle">School List</caption>
           {/* <Button
               variant="contained"
               sx={{ backgroundColor: "#F9842C" }}
@@ -319,12 +352,12 @@ const handleRejectHouseHold=(id)=>{
           
           <TableHead>
             <TableRow>
-              <TableCell align="center">Phone</TableCell>
+              <TableCell align="center">Name</TableCell>
               <TableCell>Source</TableCell>
               <TableCell align="center">Distance</TableCell>
-              <TableCell align="center">Frequency</TableCell>
+              <TableCell align="center">Type</TableCell>
               <TableCell align="center">Status</TableCell>
-             
+              <TableCell align="center">ACTION</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -338,54 +371,105 @@ const handleRejectHouseHold=(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-              {
-                details.status=="Approved"?
-                <React.Fragment>
-                <TableCell align="center">{details.phoneNumber}</TableCell>
+              {details.status==="Pending"?
+            <React.Fragment>
+            <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
                
                 <TableCell align="center">{details.how_long}</TableCell>
-                <TableCell align="center">{details.frequency}</TableCell>
+                <TableCell align="center">{details.type}</TableCell>
                 <TableCell align="center">{details.status}</TableCell>
                 <TableCell align="center">
 
-               
+                <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  '& > *': {
+                    m: 1,
+                  },
+                }}
+                >
+                
+                <ButtonGroup variant="text" aria-label="text button group">
+                  <Button onClick={async()=>{
+                    handleAproveHealthFacility(details.id)
+                   }}>Approve</Button>
+                  <Button onClick={()=>{
+                    handleRejectHealthfacility(details.id)
+                  }}>Reject</Button>
+                  <Button onClick={()=>{
+                    handleFeedBack(details.id)
+                  }}>Feed Back</Button>
+                </ButtonGroup>
+                </Box>
       
               
                 </TableCell>
-                </React.Fragment>:null
-              }
+            </React.Fragment>:
+            null
+            
+            }
                 
               </TableRow>
               ))}
               </React.Fragment>
             ):(
               <React.Fragment>
-              {houseHoldsDetails.slice(0, limit).map((details) => (
+              {
+                       
+                getHealthfacilities.details.slice(0, limit).map((details) => (
               <TableRow
                 hover
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-              {details.status=="Approved"?
-            <React.Fragment>
-            <TableCell align="center">{details.phoneNumber}</TableCell>
-            <TableCell component="th" scope="row">
-              {details.source}
-            </TableCell>
-           
-            <TableCell align="center">{details.how_long}</TableCell>
-            <TableCell align="center">{details.frequency}</TableCell>
-            <TableCell align="center">{details.status}</TableCell>
-            <TableCell align="center">
-
-          
-            </TableCell>
-            </React.Fragment>:null
-          }
-               
+              {details.status==="Pending"?
+              <React.Fragment>
+              <TableCell align="center">{details.name}</TableCell>
+                  <TableCell component="th" scope="row">
+                    {details.source}
+                  </TableCell>
+                 
+                  <TableCell align="center">{details.how_long}</TableCell>
+                  <TableCell align="center">{details.type}</TableCell>
+                  <TableCell align="center">{details.status}</TableCell>
+                  <TableCell align="center">
+  
+                  <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    '& > *': {
+                      m: 1,
+                    },
+                  }}
+                  >
+                  
+                  <ButtonGroup variant="text" aria-label="text button group">
+                    <Button onClick={async()=>{
+                      handleAproveHealthFacility(details.id)
+                     }}>Approve</Button>
+                    <Button onClick={()=>{
+                      handleRejectHealthfacility(details.id)
+                    }}>Reject</Button>
+                    <Button onClick={()=>{
+                      handleFeedBack(details.id)
+                    }}>Feed Back</Button>
+                  </ButtonGroup>
+                  </Box>
+        
+                
+                  </TableCell>
+              </React.Fragment>:
+              null
+              
+              }
+                  
               </TableRow>
               ))}
               </React.Fragment>
@@ -397,7 +481,56 @@ const handleRejectHouseHold=(id)=>{
       </TableContainer>
       </Container>
     </Page>
-    
+    <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>user information</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            please provide user unformation. We
+            will send updates occasionally.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="FullNames"
+            label="Full Names"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+           <TextField
+            autoFocus
+            margin="dense"
+            id="email"
+            label="Email Address"
+            type="email"
+            fullWidth
+            variant="standard"
+          />
+            <TextField
+          id="outlined-select-currency-native"
+          select
+          label="Native select"
+          value={role}
+          fullWidth
+          variant="standard"
+          onChange={handleChange}
+          SelectProps={{
+            native: true,
+          }}
+          helperText="Please select the Role"
+        >
+          {roles.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </TextField>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Save</Button>
+        </DialogActions>
+      </Dialog>
 
     </React.Fragment>
    

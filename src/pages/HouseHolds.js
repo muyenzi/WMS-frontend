@@ -322,6 +322,9 @@ const handleRejectHouseHold=(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
+              {
+                details.status==="Pending"?
+                <React.Fragment>
                 <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
@@ -358,6 +361,10 @@ const handleRejectHouseHold=(id)=>{
       
               
                 </TableCell>
+
+                </React.Fragment>:null
+              }
+                
               </TableRow>
               ))}
               </React.Fragment>
@@ -369,7 +376,10 @@ const handleRejectHouseHold=(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-                <TableCell align="center">{details.phoneNumber}</TableCell>
+              {
+                details.status==="Pending"?
+                <React.Fragment>
+                <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
@@ -402,7 +412,13 @@ const handleRejectHouseHold=(id)=>{
                   }}>Feed Back</Button>
                 </ButtonGroup>
                 </Box>
+      
+              
                 </TableCell>
+
+                </React.Fragment>:null
+              }
+                
               </TableRow>
               ))}
               </React.Fragment>
@@ -414,8 +430,6 @@ const handleRejectHouseHold=(id)=>{
       </TableContainer>
       </Container>
     </Page>
-    
-
     </React.Fragment>
    
   );

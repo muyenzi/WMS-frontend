@@ -198,7 +198,9 @@ const [open, setOpen] = React.useState(false);
   const [householdFrequency,setHouseholdFrequency]=useState('')
   const [householdHowLong,setHouseholdHowLong]=useState('');
   const [totalNumberOfSchool,setTotalNumberOfSchool]=useState('')
-  const [totalNumberOfHouseHold,setTotalNumberOfHouseHold]=useState('')
+  const [totalNumberOfHouseHold,setTotalNumberOfHouseHold]=useState('');
+  const [totalNumberOfHealthfacility,setTotalNumberOfHealthfacility]=useState('')
+
   useEffect(() => {
     const auth=localStorage.getItem("wmsAuth")
     const userAuth=localStorage.getItem("userAuth")
@@ -252,6 +254,7 @@ const [open, setOpen] = React.useState(false);
   useEffect(()=>{
     async function fetchSchoolData() {
       const url=`http://localhost:8000/api/schools/`
+   
       await axios.get(url)
       .then(function (response) {
         console.log(response.data);
@@ -261,6 +264,19 @@ const [open, setOpen] = React.useState(false);
         console.log(error);
       });
     }
+
+      async function fetchHealthFacility() {
+        const url=`http://localhost:8000/api/healthfacilities`
+        await axios.get(url)
+        .then(function (response) {
+          console.log(response.data);
+          setTotalNumberOfHealthfacility(response.data.data.length)
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      }
+    
     async function fetchHouseHoldData() {
       const url=`http://localhost:8000/api/households/`
       await axios.get(url)
@@ -274,6 +290,7 @@ const [open, setOpen] = React.useState(false);
     }
     fetchHouseHoldData() 
     fetchSchoolData();
+    fetchHealthFacility()
   },[])
  
   useEffect(() => {
@@ -291,7 +308,145 @@ const [open, setOpen] = React.useState(false);
     }
   }
     fetchData();
+    getData();
+    getDataHouseHold();
+    getDataHealthFacilities()
   },[!provinces.details,!districts.details]);
+
+
+  const [pieData, setPieData] = useState([]);
+  const [lineData, setLineData] = useState([]);
+  const [radarData, setRadarData] = useState([]);
+
+
+  const getDataHealthFacilities = async () => {
+   
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let SurfaceWaterSource = 0;
+    const url='http://localhost:8000/api/healthfacilities'
+    try {
+      const responce = await axios.get(url);
+      
+      for (const key in responce.data.data) {
+        let source = responce.data.data[key].source;
+        let distance=responce.data.data[key].how_long
+        let provName=responce.data.data[key].prov_name
+        if (source=== "an improved source" ) {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "an improved source" && distance==="less than 30 minutes round trip" ) {
+          BasicServices =  BasicServices + 1;
+        } else if (source === "an improved source" && distance==="more than 30 minutes round trip" ) {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          SurfaceWaterSource = SurfaceWaterSource  + 1;
+        }
+      }
+    
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Surface Water", value: SurfaceWaterSource },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Basic Services ", value: BasicServices},
+      ];
+    
+      console.log("daooo",data)
+       setRadarData(data);
+    // setPieData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
+  const getDataHouseHold = async () => {
+   
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let SurfaceWaterSource = 0;
+    const url='http://localhost:8000/api/households'
+    try {
+      const responce = await axios.get(url);
+      
+      for (const key in responce.data.data) {
+        let source = responce.data.data[key].source;
+        let distance=responce.data.data[key].how_long
+        let provName=responce.data.data[key].prov_name
+        if (source=== "On premises from a piped water source" ) {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "Surface water"  ) {
+          SurfaceWaterSource =  SurfaceWaterSource + 1;
+        } else if (source === "An improved source" && distance==="More than 30 minutes round trip" ) {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          BasicServices = BasicServices  + 1;
+        }
+      }
+    
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Surface Water", value: SurfaceWaterSource },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Basic Services ", value: 2},
+      ];
+    
+     
+      // const lineData = [
+      //   { name: "unfinished", "Active User": unfinished },
+      //   { name: "approved", "Active User": approved },
+      //   { name: "rejected", "Active User": rejected },
+      // ];
+      console.log("daooo",data)
+       setLineData(data);
+    // setPieData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getData = async () => {
+   
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let UnimprovedWaterSource = 0;
+    const url='http://localhost:8000/api/schools/'
+    try {
+      const responce = await axios.get(url);
+      
+      for (const key in responce.data.data) {
+        let source = responce.data.data[key].source;
+        let distance=responce.data.data[key].how_long
+        if (source=== "Packaged bottled water" || distance==="On premises ") {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "Rainwater" || distance==="Up to 500 m") {
+          BasicServices = BasicServices + 1;
+        } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+        }
+      }
+    
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Basic Services", value: BasicServices },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+      ];
+      // const lineData = [
+      //   { name: "unfinished", "Active User": unfinished },
+      //   { name: "approved", "Active User": approved },
+      //   { name: "rejected", "Active User": rejected },
+      // ];
+      // setLineDisplay(lineData);
+     setPieData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const handleClickOpenSchool = () => {
     setOpentSchool(true);
   };
@@ -444,7 +599,7 @@ const [open, setOpen] = React.useState(false);
          
         >
           {schoolsSources.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.values} value={option.values}>
               {option.label}
             </option>
           ))}
@@ -734,7 +889,7 @@ SelectProps={{
     <Page title="Dashboard">
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Water Managment System Dashboard
+          Water Monitoring System Dashboard
         </Typography>
         {
           role==="User"? 
@@ -749,7 +904,6 @@ SelectProps={{
               gridTemplateColumns: 'repeat(2, 1fr)',
             }}
           >
-            
             <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
             <Button
             sx={{ py: 2.5, textAlign: 'center' }}
@@ -811,66 +965,30 @@ SelectProps={{
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Health Facilities" total={2} color="error"  />
+          <AppWidgetSummary title="Health Facilities" total={totalNumberOfHealthfacility} color="error"  />
         </Grid>
 
           </React.Fragment>
          
           :null
         }
-         
+       
         {
           role==="SuperAdmin"?
           <React.Fragment>
           <Grid item xs={12} md={6} lg={8}>
-          <AppWebsiteVisits
-            title="Organizations"
-            subheader="(+43%) than last year"
-            chartLabels={[
-              '01/01/2003',
-              '02/01/2003',
-              '03/01/2003',
-              '04/01/2003',
-              '05/01/2003',
-              '06/01/2003',
-              '07/01/2003',
-              '08/01/2003',
-              '09/01/2003',
-              '10/01/2003',
-              '11/01/2003',
-            ]}
-            chartData={[
-              {
-                name: 'Team A',
-                type: 'column',
-                fill: 'solid',
-                data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-              },
-              {
-                name: 'Team B',
-                type: 'area',
-                fill: 'gradient',
-                data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-              },
-              {
-                name: 'Team C',
-                type: 'line',
-                fill: 'solid',
-                data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-              },
-            ]}
+          <AppConversionRates
+            title="House Holds"
+            subheader=""
+            chartData={lineData}
           />
         </Grid>
+         
 
         <Grid item xs={12} md={6} lg={4}>
           <AppCurrentVisits
             title="Schools"
-            chartData={[
-              { label: 'America', value: 4344 },
-              { label: 'Asia', value: 5435 },
-              { label: 'Europe', value: 1443 },
-              { label: 'Africa', value: 4443 },
-            ]}
+            chartData={pieData}
             chartColors={[
               theme.palette.primary.main,
               theme.palette.chart.blue[0],
@@ -881,41 +999,55 @@ SelectProps={{
         </Grid>
 
         <Grid item xs={12} md={6} lg={8}>
-          <AppConversionRates
-            title="Public Place"
-            subheader="(+43%) than last year"
+          <AppWebsiteVisits
+            title="Public Places"
+            subheader=""
+            
+              chartLabels={[8,8,9]}
+           
+           
             chartData={[
-              { label: 'Italy', value: 400 },
-              { label: 'Japan', value: 430 },
-              { label: 'China', value: 448 },
-              { label: 'Canada', value: 470 },
-              { label: 'France', value: 540 },
-              { label: 'Germany', value: 580 },
-              { label: 'South Korea', value: 690 },
-              { label: 'Netherlands', value: 1100 },
-              { label: 'United States', value: 1200 },
-              { label: 'United Kingdom', value: 1380 },
+              {
+                name: 'Kigali ',
+                type: 'column',
+                fill: 'solid',
+                data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
+              },
+              {
+                name: 'Westen',
+                type: 'area',
+                fill: 'gradient',
+                data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
+              },
+              {
+                name: 'Easten',
+                type: 'line',
+                fill: 'solid',
+                data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
+              },
+              {
+                name: 'North',
+                type: 'line',
+                fill: 'solid',
+                data: [10, 230, 36, 25, 35, 35, 64, 52, 59, 36, 39],
+              },
             ]}
           />
         </Grid>
-
         <Grid item xs={12} md={6} lg={4}>
-          <AppCurrentSubject
-            title="Health Facilities"
-            chartLabels={['English', 'History', 'Physics', 'Geography', 'Chinese', 'Math']}
-            chartData={[
-              { name: 'Series 1', data: [80, 50, 30, 40, 100, 20] },
-              { name: 'Series 2', data: [20, 30, 40, 80, 20, 80] },
-              { name: 'Series 3', data: [44, 76, 78, 13, 43, 10] },
-            ]}
-            chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
-          />
-        </Grid>
+        <AppCurrentVisits
+          title="Health Facilities"
+          chartData={radarData}
+          chartColors={[
+            theme.palette.primary.main,
+            theme.palette.chart.blue[0],
+            theme.palette.chart.violet[0],
+            theme.palette.chart.yellow[0],
+          ]}
+        />
+      </Grid>
           </React.Fragment>:null
-        }
-         
-
-          
+        }  
         </Grid>
       </Container>
     </Page>

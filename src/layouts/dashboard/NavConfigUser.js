@@ -36,9 +36,9 @@ const navConfigUser = [
   },
   
   {
-    title: 'Not found',
+    title: '',
     path: '/404',
-    icon: getIcon('eva:alert-triangle-fill'),
+    icon: '',
   },
  
   

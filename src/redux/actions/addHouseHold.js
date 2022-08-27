@@ -21,11 +21,9 @@ export const addHouseHoldAction = (details,navigate) => async (dispatch) => {
     phoneNumber:householdPhone,
     source:householdSource,
     frequency:householdFrequency,
-    how_long:householdHowLong,
-    prov_name:"Kigali",
-    dis_name:"Gasabo",
-    // prov_name:provinceName,
-    // dis_name:districtName
+    how_long:householdHowLong, 
+    prov_name:provinceName,
+    dis_name:districtName
    });
     const {data} = await res;
    console.log(data)
