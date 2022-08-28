@@ -48,7 +48,7 @@ import USERLIST from '../_mock/user';
 import { getUsersAction } from "../redux/actions/getUsersAction"
 import { getSchoolsAction } from '../redux/actions/schoolsAction';
 import { getHouseholdsAction } from '../redux/actions/houseHoldAction';
-
+import { getHealthfacilitiesAction } from 'src/redux/actions/healthfacilitiesAction';
 
 import moment from "moment";
 import jsPdf from "jspdf";
@@ -130,10 +130,13 @@ export default function School() {
   const [role, setRole] = React.useState('User');
   const [usersDetails,setUsersDetails]=useState('')
   const [ houseHoldsDetails, setHouseHoldsDetails]=useState([])
+  const [healthFacilitiesDetails,setHealthFacilitiesDetails]=useState([])
  const dispatch=useDispatch();
  const getAllUsers=useSelector((state)=>state.getUsers);
  const getSchools=useSelector((state)=>state.getSchools);
  const getHouseHolds=useSelector((state)=>state.getHouseHolds)
+ const getHealthfacilities=useSelector((state)=>state.getHealthfacilities);
+
  const [openFeedBack,setOpenFeedBack]=useState(false)
  const [limit, setLimit] = useState(5);
  const [selectedExamIds, setSelectedExamIds] = useState([]);
@@ -144,7 +147,7 @@ export default function School() {
     setOpenFeedBack(true)
    }
    const todaydate=new Date().toISOString().slice(0,10);
-   const generateListOfApprovedHoseHold =()=> {
+   const generateListOfApprovedHealthfacilities =()=> {
     const doc = new jsPdf();
     doc.addImage(logo, "JPEG", 20, 5, 40, 40);
     doc.setFont("Helvertica", "normal");
@@ -154,19 +157,17 @@ export default function School() {
     doc.setFont("Helvertica", "normal");
     doc.text(`Date ${todaydate}`, 140, 65);
     doc.setFont("Helvertica", "bold");
-    doc.text("Liste of approved households", 70, 75);
-     const tableColumn=['Phone','Province','District','Source','status']
+    doc.text("Liste of approved healthfacilities", 70, 75);
+     const tableColumn=['Name','Province','District','Source','status']
     const tableRows=[]
   
-    houseHoldsDetails.map(h =>{
+    healthFacilitiesDetails.map(h =>{
       const householdData=[
-        h.phoneNumber,
+        h.name,
         h.prov_name,
         h.dis_name,
         h.source,
         h.status,
-       
-       // format(new Date(student.updated_at), "yyyy-MM-dd")
   
       ];
        if(h.status==="Approved"){
@@ -195,38 +196,20 @@ export default function School() {
   };
   
   
-const handleAproveHouseHold=(id)=>{
-const url=`http://localhost:8000/api/households/approve-household/${id}`
-axios.put(url, {})
-.then(function (response) {
-  console.log(response.data);
-})
-.catch(function (error) {
-  console.log(error);
-});
-}
-const handleRejectHouseHold=(id)=>{
-  const url=`http://localhost:8000/api/households/reject-household/${id}`
-  axios.put(url, {})
-  .then(function (response) {
-    console.log(response.data);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-  }
+
+
  useEffect(() => {
   async function fetchData() {
    // await dispatch(getUsersAction())
-    await dispatch(getHouseholdsAction())
-    if (!getHouseHolds.loading) {
-      if (getHouseHolds.details) {
-        setHouseHoldsDetails(getHouseHolds.details)
+    await dispatch(getHealthfacilitiesAction())
+    if (!getHealthfacilities.loading) {
+      if (getHealthfacilities.details) {
+        setHealthFacilitiesDetails(getHealthfacilities.details)
       }
     }
   }
   fetchData();
-}, [getHouseHolds.details]);
+}, [getHealthfacilities.details]);
   const handleChange = (event) => {
     setRole(event.target.value);
   };
@@ -266,15 +249,15 @@ const handleRejectHouseHold=(id)=>{
     try {
       var results = [];
       const toSearch = trimString(searchKey); // trim it
-      for (var i = 0; i < houseHoldsDetails.length; i++) {
-        for (var key in houseHoldsDetails[i]) {
-          if (houseHoldsDetails[i][key] != null) {
+      for (var i = 0; i < healthFacilitiesDetails.length; i++) {
+        for (var key in healthFacilitiesDetails[i]) {
+          if (healthFacilitiesDetails[i][key] != null) {
             if (
-                houseHoldsDetails[i][key].toString().toLowerCase().indexOf(toSearch) !=
+                healthFacilitiesDetails[i][key].toString().toLowerCase().indexOf(toSearch) !=
               -1
             ) {
-              if (!itemExists(results, houseHoldsDetails[i]))
-                results.push(houseHoldsDetails[i]);
+              if (!itemExists(results, healthFacilitiesDetails[i]))
+                results.push(healthFacilitiesDetails[i]);
             }
           }
         }
@@ -320,7 +303,7 @@ const handleRejectHouseHold=(id)=>{
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-          List of Approved   HouseHold
+          List of Approved   HealthFacilities
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
@@ -357,7 +340,7 @@ const handleRejectHouseHold=(id)=>{
           
           <ButtonGroup variant="text" aria-label="text button group">
             
-            <Button onClick={generateListOfApprovedHoseHold }>Generate report</Button>
+            <Button onClick={generateListOfApprovedHealthfacilities }>Generate report</Button>
           </ButtonGroup>
           </Box>
 
@@ -372,20 +355,16 @@ const handleRejectHouseHold=(id)=>{
               >
               Print
               </Button> */}
-             
-          
           <TableHead>
             <TableRow>
-              <TableCell align="center">Phone</TableCell>
+              <TableCell align="center">Name</TableCell>
               <TableCell>Source</TableCell>
               <TableCell align="center">Distance</TableCell>
               <TableCell align="center">Frequency</TableCell>
               <TableCell align="center">Status</TableCell>
-             
             </TableRow>
           </TableHead>
           <TableBody>
-        
           {
             search?(
               <React.Fragment>
@@ -398,7 +377,7 @@ const handleRejectHouseHold=(id)=>{
               {
                 details.status=="Approved"?
                 <React.Fragment>
-                <TableCell align="center">{details.phoneNumber}</TableCell>
+                <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
@@ -420,7 +399,7 @@ const handleRejectHouseHold=(id)=>{
               </React.Fragment>
             ):(
               <React.Fragment>
-              {houseHoldsDetails.slice(0, limit).map((details) => (
+              {healthFacilitiesDetails.slice(0, limit).map((details) => (
               <TableRow
                 hover
                 key={details.id}
@@ -428,7 +407,7 @@ const handleRejectHouseHold=(id)=>{
               >
               {details.status=="Approved"?
             <React.Fragment>
-            <TableCell align="center">{details.phoneNumber}</TableCell>
+            <TableCell align="center">{details.name}</TableCell>
             <TableCell component="th" scope="row">
               {details.source}
             </TableCell>

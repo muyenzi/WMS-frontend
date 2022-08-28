@@ -39,6 +39,8 @@ var _houseHoldReducer = _interopRequireDefault(require("./houseHoldReducer"));
 
 var _healthfacilityReducer = _interopRequireDefault(require("./healthfacilityReducer"));
 
+var _addHealthFacilityReducer = _interopRequireDefault(require("./addHealthFacilityReducer"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var allReducers = (0, _redux.combineReducers)({
@@ -57,7 +59,8 @@ var allReducers = (0, _redux.combineReducers)({
   approvedSchools: _approvedSchoolsReducer["default"],
   addHouseHold: _addHouseHoldReducer["default"],
   getHouseHolds: _houseHoldReducer["default"],
-  getHealthfacilities: _healthfacilityReducer["default"]
+  getHealthfacilities: _healthfacilityReducer["default"],
+  addHealthFacility: _addHealthFacilityReducer["default"]
 });
 var _default = allReducers;
 exports["default"] = _default;

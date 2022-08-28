@@ -1,8 +1,8 @@
 import {
-    ADD_HOUSEHOLD_REQUEST,
-    ADD_HOUSEHOLD_SUCCESS,
-    ADD_HOUSEHOLD_FAILURE,
-  } from "../types/addHouseHoldTypes";
+    ADD_HEALTHFACILITY_REQUEST,
+    ADD_HEALTHFACILITY_SUCCESS,
+    ADD_HEALTHFACILITY_FAILURE,
+  } from "../types/addHealthFacilityTypes";
   
   const initialState = {
     loading: false,
@@ -12,18 +12,18 @@ import {
   
   const reducer = (state = initialState, action) => {
     switch (action.type) {
-      case ADD_HOUSEHOLD_REQUEST:
+      case ADD_HEALTHFACILITY_REQUEST:
         return {
           ...state, 
           loading: true,
         };
-      case ADD_HOUSEHOLD_SUCCESS:
+      case ADD_HEALTHFACILITY_SUCCESS:
         return {
           loading: false,
           details: action.payload,
           error: "",
         };
-      case ADD_HOUSEHOLD_FAILURE:
+      case ADD_HEALTHFACILITY_FAILURE:
         return {
           loading: false,
           details: [],

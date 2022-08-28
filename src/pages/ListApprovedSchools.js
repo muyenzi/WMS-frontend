@@ -42,6 +42,10 @@ import { UserListHead, UserListToolbar, UserMoreMenu } from '../sections/@dashbo
 import { useDispatch,useSelector } from 'react-redux';
 import Paper from "@mui/material/Paper";
 import TableHead from "@mui/material/TableHead";
+import moment from "moment";
+import jsPdf from "jspdf";
+import autoTable from 'jspdf-autotable';
+import logo from "../components/images/logo.png";
 // mock
 import USERLIST from '../_mock/user';
 
@@ -142,6 +146,57 @@ export default function School() {
   setOpenFeedBack(true)
  }
 
+ const todaydate=new Date().toISOString().slice(0,10);
+ const generateListOfApprovedSchool =()=> {
+   const doc = new jsPdf();
+   doc.addImage(logo, "JPEG", 20, 5, 40, 40);
+   doc.setFont("Helvertica", "normal");
+   doc.text("Water Management System", 20, 50);
+   doc.text(`MININFRA`, 20, 55);
+   doc.text("Email: info@mininfra.gov.rw", 20, 60);
+   doc.setFont("Helvertica", "normal");
+   doc.text(`Date ${todaydate}`, 140, 65);
+   doc.setFont("Helvertica", "bold");
+   doc.text("Liste of approved schools", 70, 75);
+    const tableColumn=['Name','Province','District','Level','status']
+   const tableRows=[]
+ 
+   schoolsDetails.map(school =>{
+     const schoolData=[
+       school.name,
+       school.prov_name,
+       school.dis_name,
+       school.level,
+       school.status,
+      
+      // format(new Date(student.updated_at), "yyyy-MM-dd")
+ 
+     ];
+      if(school.status==="Approved"){
+     tableRows.push(schoolData);
+      }
+     
+   });
+  
+   doc.autoTable(tableColumn, tableRows, { 
+     startY: 80,
+   theme: "striped",
+   margin: 10,
+   styles: {
+     font: "courier",
+     fontSize: 12,
+     overflow: "linebreak",
+     cellPadding: 3,
+     halign: "center",
+   },
+   head: [tableColumn],
+   body: [tableRows],
+    });
+ const date = Date().split(" ");
+ const dateStr = date[0] + date[1] + date[2] + date[3] + date[4];
+ doc.save(`report_${dateStr}.pdf`);
+ };
+ 
 
 const handleAproveSchool=(id)=>{
 const url=`http://localhost:8000/api/schools/approve-school/${id}`
@@ -306,7 +361,7 @@ const handleRejectSchool=(id)=>{
           
           <ButtonGroup variant="text" aria-label="text button group">
             
-            <Button >Print</Button>
+            <Button onClick={generateListOfApprovedSchool} >Generate report</Button>
           </ButtonGroup>
           </Box>
 

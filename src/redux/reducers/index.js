@@ -16,6 +16,8 @@ import addHouseHoldReducer from "./addHouseHoldReducer";
 import getHouseHoldReducer from "./houseHoldReducer";
 import healthfacilitiesReducer from "./healthfacilityReducer";
 
+import addHealthFacilityReducer from "./addHealthFacilityReducer";
+
 const allReducers = combineReducers({
     userLogin:loginReducer,
     getUsers:usersReducer,
@@ -33,6 +35,7 @@ const allReducers = combineReducers({
     addHouseHold:addHouseHoldReducer,
     getHouseHolds:getHouseHoldReducer,
     getHealthfacilities: healthfacilitiesReducer,
+    addHealthFacility: addHealthFacilityReducer,
 });
 
 export default allReducers;

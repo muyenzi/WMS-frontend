@@ -31,7 +31,7 @@ const navConfigUser = [
   },
   {
     title: 'Health Facilities',
-    path: '/dashboard/organizations',
+    path: '/dashboard/healthfacilitiesrejected',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   

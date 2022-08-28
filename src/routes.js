@@ -18,6 +18,8 @@ import ListApprovedSchools from './pages/ListApprovedSchools';
 import ListApprovedHouseHold from './pages/ListApprovedHouseHold';
 import HouseHolds from "./pages/HouseHolds";
 import HealthFacility from "./pages/HealthFacility";
+import ListApprovedHealthFacility from "./pages/ListApprovedHealthFacility";
+import ListRejectedHealthFacility from "./pages/ListRejectedHealthFacility";
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -31,10 +33,13 @@ export default function Router() {
         { path: 'schools', element: <School /> },
         { path: 'households', element: <HouseHolds /> },
         { path: 'householdsapproved', element: <ListApprovedHouseHold /> },
+        { path: 'healthfacilitiesapproved', element: <ListApprovedHealthFacility /> },
         { path: 'organizations', element: <Organization /> },
         { path: 'products', element: <Products /> },
         { path: 'schoolsrejected', element: <ListRejectedSchools /> },
         { path: 'householdsrejected', element: <ListRejectedHouseHolds /> },
+        
+        { path: 'healthfacilitiesrejected', element: <ListRejectedHealthFacility /> },
         { path: 'healthfacilities',element: <HealthFacility />}, 
         { path: 'schoolsapproved', element: <ListApprovedSchools /> },
         { path: 'blog', element: <Blog /> },

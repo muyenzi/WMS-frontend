@@ -29,7 +29,11 @@ const navConfig = [
     icon: getIcon('eva:pie-chart-2-fill'),
   },
  
- 
+  {
+    title: 'Health Facilities',
+    path: '/dashboard/healthfacilitiesapproved',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
  
   {
     title: 'data collection',

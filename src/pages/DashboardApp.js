@@ -36,11 +36,63 @@ import { getCellsAction } from '../redux/actions/cellsAction';
 import { getVillagesAction } from '../redux/actions/villagesAction';
 import { addSchoolAction } from '../redux/actions/addSchoolAction';
 import { addHouseHoldAction } from '../redux/actions/addHouseHold';
+import { addHealthFacilityAction } from '../redux/actions/addHealthFacilityAction';
 import Collapse from "@mui/material/Collapse";
 import Alert from '@mui/material/Alert'
 import CloseIcon from '@mui/icons-material/Close';
 import {  IconButton} from '@mui/material';
 import axios from "axios"
+const healthFacilitySources =[
+  {
+  values:"a piped water source",
+  label:"a piped water source",
+},
+{
+  values:"an improved source",
+  label:"an improved source",
+},
+{
+  values:"surface water",
+  label:"surface water",
+},
+
+]
+const healthFacilityHowLongs =[
+  {
+  values:"less than 30 minutes round trip",
+  label:"less than 30 minutes round trip",
+},
+{
+  values:"more than 30 minutes round trip",
+  label:"more than 30 minutes round trip",
+}
+
+]
+
+const healthFacilityTypes =[
+  {
+  values:"hospital",
+  label:"hospital",
+},
+{
+  values:"Health center",
+  label:"Health center",
+},
+{
+  values:"Health post",
+  label:"Health post",
+},
+{
+  values:"Polyclinic",
+  label:"Polyclinic",
+},
+{
+  values:"Clinic",
+  label:"Clinic",
+},
+
+
+]
 
 const schoolsLevels =[
   {
@@ -169,18 +221,20 @@ const householdHowLongs=[
 export default function DashboardApp() {
   const theme = useTheme();
 const dispatch=useDispatch();
-const provinces=useSelector(state=>state.getProvinces)
-const districts=useSelector(state=>state.getDistricts)
-const sectors=useSelector(state=>state.getSectors)
-const cells=useSelector(state=>state.getCells)
-const villages=useSelector(state=>state.getVillages)
-const addSchool=useSelector(state=>state.addSchool);
-const addHouseHold=useSelector(state=>state.addHouseHold);
+const provinces=useSelector((state)=>state.getProvinces)
+const districts=useSelector((state)=>state.getDistricts)
+const sectors=useSelector((state)=>state.getSectors)
+const cells=useSelector((state)=>state.getCells)
+const villages=useSelector((state)=>state.getVillages)
+const addSchool=useSelector((state)=>state.addSchool);
+const addHouseHold=useSelector((state)=>state.addHouseHold);
+const addHealthFacility=useSelector((state)=>state.addHealthFacility)
 const [openSuccess, setOpenSuccess] = React.useState(false);
 const [open, setOpen] = React.useState(false);
   const [role,setRole]=useState('')
   const [onpentSchool,setOpentSchool]=useState(false)
-  const [onpenHouseHold,setOpenHouseHold]=useState(false)
+  const [openHouseHold,setOpenHouseHold]=useState(false)
+  const [openHealthFacility,setOpenHealthFacility]=useState(false)
   const [provincesData,setProvincesData]=useState('')
   const [provinceName,setProvinceName]=useState('');
   const [provinceId,setProvinceId]=useState('');
@@ -200,6 +254,12 @@ const [open, setOpen] = React.useState(false);
   const [totalNumberOfSchool,setTotalNumberOfSchool]=useState('')
   const [totalNumberOfHouseHold,setTotalNumberOfHouseHold]=useState('');
   const [totalNumberOfHealthfacility,setTotalNumberOfHealthfacility]=useState('')
+  //health facility
+const [healthfacilityType,setHealthfacilityType]=useState('')
+const [healthfacilityHowLong,setHealthfacilityHowLong]=useState('')
+const [healthfacilitySource,setHealthfacilitySource]=useState('')
+const [healthfacilityName,setHealthfacilityName]=useState('')
+
 
   useEffect(() => {
     const auth=localStorage.getItem("wmsAuth")
@@ -223,11 +283,20 @@ const [open, setOpen] = React.useState(false);
       }
     })
   }
+  const handleSaveHealthFacility=async ()=>{
+    await dispatch(addHealthFacilityAction({provinceName,districtName,healthfacilityType,healthfacilityName,healthfacilitySource,healthfacilityHowLong} ))
+    if(addHealthFacility.error){
+      setOpen(true)
+    }
+    if(addHealthFacility.details){
+      setOpenSuccess(true)
+    }
+  }
   const handleSaveHouseHold=async()=>{
     
     console.log("data..kkk..ll..",provinceName,districtName ,householdPhone,householdSource,householdFrequency,householdHowLong)
   await dispatch(addHouseHoldAction({provinceName,districtName ,householdPhone,householdSource,householdFrequency,householdHowLong}))
-  if(addSchool.error){
+  if(addHouseHold.error){
     setOpen(true)
   }
   if(addHouseHold.details){
@@ -453,16 +522,219 @@ const [open, setOpen] = React.useState(false);
   const handleClickOpenHouseHold = () => {
     setOpenHouseHold(true);
   };
+  const handleOpenHealthFacility=()=>{
+    setOpenHealthFacility(true)
+  }
 
   const handleClose = () => {
     setOpentSchool(false);
     setOpenHouseHold(false);
+    setOpenHealthFacility(false)
   
   };
 
 
   return (
     <React.Fragment>
+    <Dialog open={openHealthFacility} onClose={handleClose}>
+    <DialogTitle>HealthFacility information</DialogTitle>
+    <DialogContent>
+      <DialogContentText>
+        please provide HealthFacility unformation. We
+        will send updates occasionally.
+      </DialogContentText>
+      {
+        !addHealthFacility.error? null:
+         <Collapse in={open}>
+         <Alert
+         severity="error"
+           action={
+             <IconButton
+               aria-label="close"
+               color="inherit"
+               size="small"
+               onClick={handleClose}
+             
+             >
+               <CloseIcon fontSize="inherit" />
+             </IconButton>
+           }
+           sx={{ mb: 0.2 }}
+         >
+          {addHealthFacility.error}
+         </Alert>
+       </Collapse>
+      }    
+      {
+        addHealthFacility.details? <Collapse in={openSuccess}>
+        <Alert
+        severity="success"
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={handleClose}
+            
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 0.2 }}
+        >
+         {addHealthFacility.details}
+        </Alert>
+      </Collapse>:null
+      }
+     
+      <TextField
+        autoFocus
+        margin="dense"
+        id="healthfacilityName"
+        name="healthfacilityName"
+       onChange={(e)=>setHealthfacilityName(e.target.value)}
+        value={healthfacilityName}
+        label=" Name"
+        required
+        type="text"
+        fullWidth
+        variant="standard"
+      />
+    
+      <TextField
+      id="outlined-select-currency-native"
+      select
+      label="Select "
+     // value={role}
+     // name="role"
+      fullWidth
+      required
+      variant="standard"
+      onChange={(e)=>handleOnChange(e)
+        }
+     onKeyPress={handleDistrict}
+      SelectProps={{
+        native: true,
+      }} 
+    >
+      {provinces.details.map((option) => (
+        <option key={option.id} value={option.id}  >
+        
+          {option.Provinces}
+        </option>
+      ))}
+    </TextField>
+    {
+      !districts.details.length?null:
+      <TextField
+      id="outlined-select-currency-native"
+      select
+      label="Select "
+     // value={role}
+     // name="role"
+      fullWidth
+      required
+      variant="standard"
+      onChange={(e)=>handleOnChange(e)
+        }
+     onKeyPress={handleDistrict}
+      SelectProps={{
+        native: true,
+      }} 
+    >
+      {districts.details.map((option) => (
+        <option key={option.id} value={option.id}  >
+        
+          {option.Districts}
+        </option>
+      ))}
+    </TextField>
+
+     }
+   
+
+      <Typography variant="h6" gutterBottom>
+      1.	What is the type of the health facility? (select one that applies)
+       </Typography>
+        <TextField
+      id="outlined-select-currency-native"
+      select
+      label="Select "
+     value={healthfacilityType}
+      name="healtfacilityType"
+      fullWidth
+      required
+      variant="standard"
+     onChange={(e)=>setHealthfacilityType(e.target.value)}
+      SelectProps={{
+        native: true,
+      }}
+     
+    >
+      {healthFacilityTypes.map((option) => (
+        <option key={option.values} value={option.values}>
+          {option.label}
+        </option>
+      ))}
+    </TextField>
+
+    <Typography variant="h6" gutterBottom>
+    2.	What is the main source of water provided by the HF?
+   </Typography>
+    <TextField
+  id="outlined-select-currency-native"
+  select
+  label="Select "
+ value={healthfacilitySource}
+  name="healthfacilitySource"
+  fullWidth
+  required
+  variant="standard"
+  onChange={(e)=>setHealthfacilitySource(e.target.value)}
+  SelectProps={{
+    native: true,
+  }}
+ 
+>
+  {healthFacilitySources.map((option) => (
+    <option key={option.value} value={option.value}>
+      {option.label}
+    </option>
+  ))}
+</TextField>
+<Typography variant="h6" gutterBottom>
+3.  Approximatively, how long did it take for members to get there and come back from where they collected water?
+</Typography>
+<TextField
+id="outlined-select-currency-native"
+select
+label="Select "
+value={healthfacilityHowLong}
+name="healthfacilityHowLong"
+fullWidth
+required
+variant="standard"
+onChange={(e)=>setHealthfacilityHowLong(e.target.value)}
+SelectProps={{
+native: true,
+}}
+
+>
+{healthFacilityHowLongs.map((option) => (
+<option key={option.value} value={option.value}>
+  {option.label}
+</option>
+))}
+</TextField>
+
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={handleClose}>Cancel</Button>
+      <Button onClick={handleSaveHealthFacility} >
+  {addHealthFacility.loading?"loading":"Save"}
+      </Button>
+    </DialogActions>
+  </Dialog>
     <Dialog open={onpentSchool} onClose={handleClose}>
         <DialogTitle>School information</DialogTitle>
         <DialogContent>
@@ -685,7 +957,7 @@ const [open, setOpen] = React.useState(false);
           </Button>
         </DialogActions>
       </Dialog>
-      <Dialog open={onpenHouseHold} onClose={handleClose}>
+      <Dialog open={openHouseHold} onClose={handleClose}>
       <DialogTitle>HouseHold information</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -926,6 +1198,7 @@ SelectProps={{
               <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
             <Button
             sx={{ py: 2.5, textAlign: 'center' }}
+            onClick={handleOpenHealthFacility}
             >
                 {/* <Box sx={{ mb: 0.5 }}>icon</Box> */}
                 <Typography variant="h6">Health Facilities</Typography>
