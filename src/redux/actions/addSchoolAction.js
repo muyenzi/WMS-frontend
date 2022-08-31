@@ -12,6 +12,9 @@ export const addSchoolAction = (details,navigate) => async (dispatch) => {
    // provinceName,districtName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel
     const {provinceName}=details
     const {districtName}=details
+    const {sectorName}=details
+    const {cellName}=details
+    const {villageName}=details
     const {schoolName}=details
    const {schoolSource}=details
     const {schoolFrequency}=details
@@ -25,7 +28,10 @@ export const addSchoolAction = (details,navigate) => async (dispatch) => {
     how_long:schoolHowLong,
     level:schoolLevel,
     prov_name:provinceName,
-    dis_name:districtName
+    dis_name:districtName,
+    sec_name:sectorName,
+    cell_name:cellName,
+    vil_name:villageName
    });
     const {data} = await res;
    console.log(data)

@@ -3,43 +3,41 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.addSchoolFailure = exports.addSchoolSuccess = exports.addSchoolRequest = exports.addSchoolAction = void 0;
+exports.addPublicPlaceFailure = exports.addPublicPlaceSuccess = exports.addPublicPlaceRequest = exports.addPublicPlaceAction = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
-var _addSchoolTypes = require("../types/addSchoolTypes");
+var _addPublicPlaceTypes = require("../types/addPublicPlaceTypes");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var addSchoolAction = function addSchoolAction(details, navigate) {
+var addPublicPlaceAction = function addPublicPlaceAction(details, navigate) {
   return function _callee(dispatch) {
-    var provinceName, districtName, sectorName, cellName, villageName, schoolName, schoolSource, schoolFrequency, schoolHowLong, schoolLevel, Url, res, _ref, data, errorMessage;
+    var provinceName, districtName, sectorName, cellName, villageName, publicPlaceName, publicPlaceSource, publicPlaceType, publicPlaceHowLong, Url, res, _ref, data, errorMessage;
 
     return regeneratorRuntime.async(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            dispatch(addSchoolRequest()); // provinceName,districtName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel
-
+            dispatch(addPublicPlaceRequest());
+            console.log("ooppp", details);
             provinceName = details.provinceName;
             districtName = details.districtName;
             sectorName = details.sectorName;
             cellName = details.cellName;
             villageName = details.villageName;
-            schoolName = details.schoolName;
-            schoolSource = details.schoolSource;
-            schoolFrequency = details.schoolFrequency;
-            schoolHowLong = details.schoolHowLong;
-            schoolLevel = details.schoolLevel;
-            Url = 'http://localhost:8000/api/schools/new-chool';
+            publicPlaceName = details.publicPlaceName;
+            publicPlaceSource = details.publicPlaceSource;
+            publicPlaceType = details.publicPlaceType;
+            publicPlaceHowLong = details.publicPlaceHowLong;
+            Url = 'http://localhost:8000/api/publicplaces/new-publicplace';
             _context.next = 15;
             return regeneratorRuntime.awrap(_axios["default"].post(Url, {
-              name: schoolName,
-              source: schoolSource,
-              frequency: schoolFrequency,
-              how_long: schoolHowLong,
-              level: schoolLevel,
+              name: publicPlaceName,
+              source: publicPlaceSource,
+              type: publicPlaceType,
+              how_long: publicPlaceHowLong,
               prov_name: provinceName,
               dis_name: districtName,
               sec_name: sectorName,
@@ -58,7 +56,7 @@ var addSchoolAction = function addSchoolAction(details, navigate) {
             console.log(data);
 
             if (data.responseCode === 200) {
-              dispatch(addSchoolSuccess(data.message));
+              dispatch(addPublicPlaceSuccess(data.message));
             }
 
             _context.next = 34;
@@ -79,12 +77,12 @@ var addSchoolAction = function addSchoolAction(details, navigate) {
           case 29:
             errorMessage = _context.sent;
             //const errorMessage = 'Invalid Username or Pin'
-            dispatch(addSchoolFailure(errorMessage));
+            dispatch(addPublicPlaceFailure(errorMessage));
             _context.next = 34;
             break;
 
           case 33:
-            dispatch(addSchoolFailure("Network Error"));
+            dispatch(addPublicPlaceFailure("Network Error"));
 
           case 34:
           case "end":
@@ -95,30 +93,30 @@ var addSchoolAction = function addSchoolAction(details, navigate) {
   };
 };
 
-exports.addSchoolAction = addSchoolAction;
+exports.addPublicPlaceAction = addPublicPlaceAction;
 
-var addSchoolRequest = function addSchoolRequest() {
+var addPublicPlaceRequest = function addPublicPlaceRequest() {
   return {
-    type: _addSchoolTypes.ADD_SCHOOL_REQUEST
+    type: _addPublicPlaceTypes.ADD_PUBLICPLACE_REQUEST
   };
 };
 
-exports.addSchoolRequest = addSchoolRequest;
+exports.addPublicPlaceRequest = addPublicPlaceRequest;
 
-var addSchoolSuccess = function addSchoolSuccess(schools) {
+var addPublicPlaceSuccess = function addPublicPlaceSuccess(details) {
   return {
-    type: _addSchoolTypes.ADD_SCHOOL_SUCCESS,
-    payload: schools
+    type: _addPublicPlaceTypes.ADD_PUBLICPLACE_SUCCESS,
+    payload: details
   };
 };
 
-exports.addSchoolSuccess = addSchoolSuccess;
+exports.addPublicPlaceSuccess = addPublicPlaceSuccess;
 
-var addSchoolFailure = function addSchoolFailure(error) {
+var addPublicPlaceFailure = function addPublicPlaceFailure(error) {
   return {
-    type: _addSchoolTypes.ADD_SCHOOL_FAILURE,
+    type: _addPublicPlaceTypes.ADD_PUBLICPLACE_FAILURE,
     payload: error
   };
 };
 
-exports.addSchoolFailure = addSchoolFailure;
+exports.addPublicPlaceFailure = addPublicPlaceFailure;

@@ -11,8 +11,11 @@ export const addHouseHoldAction = (details,navigate) => async (dispatch) => {
    // provinceName,districtName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel
     const {provinceName}=details
     const {districtName}=details
+    const {sectorName}=details
+    const {cellName}=details
+    const {villageName}=details
     const {householdPhone}=details
-   const  {householdSource}=details
+    const  {householdSource}=details
     const {householdFrequency}=details
     const {householdHowLong}=details
 
@@ -23,7 +26,10 @@ export const addHouseHoldAction = (details,navigate) => async (dispatch) => {
     frequency:householdFrequency,
     how_long:householdHowLong, 
     prov_name:provinceName,
-    dis_name:districtName
+    dis_name:districtName,
+    sec_name:sectorName,
+    cell_name:cellName,
+    vil_name:villageName
    });
     const {data} = await res;
    console.log(data)

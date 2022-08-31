@@ -133,16 +133,39 @@ export default function School() {
  const [selectedExamIds, setSelectedExamIds] = useState([]);
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
+ const [errorMessage,setErrorMessage]=useState('')
+ const [textMessage,setTextMessage]=useState('');
+ const [houseHoldId,setHouseHoldId]=useState('')
 
  const handleFeedBack=(id)=>{
+  setHouseHoldId(id)
     setOpenFeedBack(true)
    }
+
+   const handleSentMessage=async(id)=>{
+    const url=`http://localhost:8000/api/messages`
+    await axios.post(url, {
+      message:textMessage,
+      ref_id:houseHoldId
+    })
+     .then(function (response) {
+       console.log(response.data);
+        setErrorMessage(response.data.message)
+      
+     
+     })
+     .catch(function (error) {
+      setErrorMessage(error.response.data.message)
+       console.log(error.response.data.message);
+     });
+  }
   
 const handleAproveHouseHold=(id)=>{
 const url=`http://localhost:8000/api/households/approve-household/${id}`
 axios.put(url, {})
-.then(function (response) {
+.then(async function (response) {
   console.log(response.data);
+  await dispatch(getHouseholdsAction())
 })
 .catch(function (error) {
   console.log(error);
@@ -151,8 +174,9 @@ axios.put(url, {})
 const handleRejectHouseHold=(id)=>{
   const url=`http://localhost:8000/api/households/reject-household/${id}`
   axios.put(url, {})
-  .then(function (response) {
+  .then(async function (response) {
     console.log(response.data);
+    await dispatch(getHouseholdsAction())
   })
   .catch(function (error) {
     console.log(error);
@@ -177,6 +201,7 @@ const handleRejectHouseHold=(id)=>{
 
   const handleClose = () => {
     setOpen(false);
+    setTextMessage('')
     setOpenFeedBack(false)
   };
 
@@ -234,6 +259,14 @@ const handleRejectHouseHold=(id)=>{
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
     <DialogTitle>Provide feedbak</DialogTitle>
+    {
+      errorMessage? 
+      <Typography> 
+      {errorMessage}
+    </Typography>
+    :null
+    }
+    
     <Box
     component="form"
     sx={{
@@ -247,7 +280,10 @@ const handleRejectHouseHold=(id)=>{
       <TextField
         id="outlined-multiline-static"
         label="Type Message"
+        name="textMessage"
+        value={textMessage}
         multiline
+        onChange={(e)=>setTextMessage(e.target.value)}
         rows={4}
         defaultValue="Message..."
       />
@@ -255,7 +291,7 @@ const handleRejectHouseHold=(id)=>{
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
                   <Button onClick={handleClose} >Cancel</Button>
-                  <Button >Send</Button>
+                  <Button onClick={handleSentMessage}>Send</Button>
                  
                 </ButtonGroup>
   </Dialog>
@@ -325,7 +361,7 @@ const handleRejectHouseHold=(id)=>{
               {
                 details.status==="Pending"?
                 <React.Fragment>
-                <TableCell align="center">{details.name}</TableCell>
+                <TableCell align="center">{details.phoneNumber}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
@@ -379,7 +415,7 @@ const handleRejectHouseHold=(id)=>{
               {
                 details.status==="Pending"?
                 <React.Fragment>
-                <TableCell align="center">{details.name}</TableCell>
+                <TableCell align="center">{details.phoneNumber}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>

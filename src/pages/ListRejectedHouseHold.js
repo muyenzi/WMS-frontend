@@ -133,11 +133,23 @@ export default function School() {
  const [selectedExamIds, setSelectedExamIds] = useState([]);
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
+ const [textMessage,setTextMessage]=useState('')
 
- const handleFeedBack=(id)=>{
-    setOpenFeedBack(true)
-   }
+ const handleFeedBack=async(id)=>{
+  console.log("idd",id)
+  const url=`http://localhost:8000/api/messages/${id}`
+  await axios.get(url)
+  .then(function (response) {
+    console.log(response.data);
+    setTextMessage(response.data.data.message)
   
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  setOpenFeedBack(true)
+ }
+
 const handleAproveHouseHold=(id)=>{
 const url=`http://localhost:8000/api/households/approve-household/${id}`
 axios.put(url, {})
@@ -177,6 +189,7 @@ const handleRejectHouseHold=(id)=>{
 
   const handleClose = () => {
     setOpen(false);
+    setTextMessage("")
     setOpenFeedBack(false)
   };
 
@@ -233,7 +246,7 @@ const handleRejectHouseHold=(id)=>{
   return (
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
-    <DialogTitle>Provide feedbak</DialogTitle>
+    <DialogTitle>The information was rejected due to the following reasons:</DialogTitle>
     <Box
     component="form"
     sx={{
@@ -243,19 +256,18 @@ const handleRejectHouseHold=(id)=>{
     autoComplete="off"
   >
     <div>
-    
-      <TextField
-        id="outlined-multiline-static"
-        label="Type Message"
-        multiline
-        rows={4}
-        defaultValue="Message..."
-      />
+    {
+      textMessage?
+      <Typography>
+      {textMessage}
+     </Typography>:null
+    }
+   
     </div>
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
                   <Button onClick={handleClose} >Close</Button>
-              
+                
                  
                 </ButtonGroup>
   </Dialog>

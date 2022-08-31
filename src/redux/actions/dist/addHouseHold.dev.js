@@ -13,7 +13,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 var addHouseHoldAction = function addHouseHoldAction(details, navigate) {
   return function _callee(dispatch) {
-    var provinceName, districtName, householdPhone, householdSource, householdFrequency, householdHowLong, Url, res, _ref, data, errorMessage;
+    var provinceName, districtName, sectorName, cellName, villageName, householdPhone, householdSource, householdFrequency, householdHowLong, Url, res, _ref, data, errorMessage;
 
     return regeneratorRuntime.async(function _callee$(_context) {
       while (1) {
@@ -24,27 +24,33 @@ var addHouseHoldAction = function addHouseHoldAction(details, navigate) {
 
             provinceName = details.provinceName;
             districtName = details.districtName;
+            sectorName = details.sectorName;
+            cellName = details.cellName;
+            villageName = details.villageName;
             householdPhone = details.householdPhone;
             householdSource = details.householdSource;
             householdFrequency = details.householdFrequency;
             householdHowLong = details.householdHowLong;
             Url = 'http://localhost:8000/api/households/new-household';
-            _context.next = 11;
+            _context.next = 14;
             return regeneratorRuntime.awrap(_axios["default"].post(Url, {
               phoneNumber: householdPhone,
               source: householdSource,
               frequency: householdFrequency,
               how_long: householdHowLong,
               prov_name: provinceName,
-              dis_name: districtName
+              dis_name: districtName,
+              sec_name: sectorName,
+              cell_name: cellName,
+              vil_name: villageName
             }));
 
-          case 11:
+          case 14:
             res = _context.sent;
-            _context.next = 14;
+            _context.next = 17;
             return regeneratorRuntime.awrap(res);
 
-          case 14:
+          case 17:
             _ref = _context.sent;
             data = _ref.data;
             console.log(data);
@@ -53,37 +59,37 @@ var addHouseHoldAction = function addHouseHoldAction(details, navigate) {
               dispatch(addHouseHoldSuccess(data.message));
             }
 
-            _context.next = 30;
+            _context.next = 33;
             break;
 
-          case 20:
-            _context.prev = 20;
+          case 23:
+            _context.prev = 23;
             _context.t0 = _context["catch"](0);
 
             if (!_context.t0.response) {
-              _context.next = 29;
+              _context.next = 32;
               break;
             }
 
-            _context.next = 25;
+            _context.next = 28;
             return regeneratorRuntime.awrap(_context.t0.response.data.message);
 
-          case 25:
+          case 28:
             errorMessage = _context.sent;
             //const errorMessage = 'Invalid Username or Pin'
             dispatch(addHouseHoldFailure(errorMessage));
-            _context.next = 30;
+            _context.next = 33;
             break;
 
-          case 29:
+          case 32:
             dispatch(addHouseHoldFailure("Network Error"));
 
-          case 30:
+          case 33:
           case "end":
             return _context.stop();
         }
       }
-    }, null, null, [[0, 20]]);
+    }, null, null, [[0, 23]]);
   };
 };
 

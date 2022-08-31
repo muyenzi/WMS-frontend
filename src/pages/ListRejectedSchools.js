@@ -140,11 +140,13 @@ export default function School() {
 const  [schoolId,setSchoolId]=useState('')
 const [textMessage,setTextMessage]=useState('')
  const handleFeedBack=async(id)=>{
+  console.log("idd",id)
   const url=`http://localhost:8000/api/messages/${id}`
   await axios.get(url)
   .then(function (response) {
     console.log(response.data);
     setTextMessage(response.data.data.message)
+  
   })
   .catch(function (error) {
     console.log(error);
@@ -196,6 +198,7 @@ const handleRejectSchool=(id)=>{
 
   const handleClose = () => {
     setOpen(false);
+    setTextMessage("")
     setOpenFeedBack(false)
   };
 
@@ -252,7 +255,7 @@ const handleRejectSchool=(id)=>{
   return (
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
-    <DialogTitle>Provide feedbak</DialogTitle>
+    <DialogTitle>The information was rejected due to the following reasons:</DialogTitle>
     <Box
     component="form"
     sx={{

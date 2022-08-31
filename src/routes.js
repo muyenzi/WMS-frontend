@@ -20,6 +20,7 @@ import HouseHolds from "./pages/HouseHolds";
 import HealthFacility from "./pages/HealthFacility";
 import ListApprovedHealthFacility from "./pages/ListApprovedHealthFacility";
 import ListRejectedHealthFacility from "./pages/ListRejectedHealthFacility";
+import Filter from './pages/Filter';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -48,6 +49,10 @@ export default function Router() {
     {
       path: 'login',
       element: <Login />,
+    },
+    {
+      path: 'filter',
+      element: <Filter />,
     },
     {
       path: 'register',

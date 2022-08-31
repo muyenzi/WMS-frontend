@@ -14,6 +14,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+
+
+
+import MenuItem from '@mui/material/MenuItem';
 // sections
 import {
   AppTasks,
@@ -37,11 +41,39 @@ import { getVillagesAction } from '../redux/actions/villagesAction';
 import { addSchoolAction } from '../redux/actions/addSchoolAction';
 import { addHouseHoldAction } from '../redux/actions/addHouseHold';
 import { addHealthFacilityAction } from '../redux/actions/addHealthFacilityAction';
+import { addPublicPlaceAction } from '../redux/actions/addPublicPlaceAction';
 import Collapse from "@mui/material/Collapse";
 import Alert from '@mui/material/Alert'
 import CloseIcon from '@mui/icons-material/Close';
 import {  IconButton} from '@mui/material';
 import axios from "axios"
+
+const publicPlaceSources =[
+  {
+  values:"a piped water source",
+  label:"a piped water source",
+},
+{
+  values:"an improved source",
+  label:"an improved source",
+},
+{
+  values:"surface water",
+  label:"surface water",
+},
+
+]
+const publicPlaceHowLongs =[
+  {
+  values:"less than 30 minutes round trip",
+  label:"less than 30 minutes round trip",
+},
+{
+  values:"more than 30 minutes round trip",
+  label:"more than 30 minutes round trip",
+}
+
+]
 const healthFacilitySources =[
   {
   values:"a piped water source",
@@ -57,6 +89,19 @@ const healthFacilitySources =[
 },
 
 ]
+const publicPlaceTypes =[
+  {
+  values:"Market",
+  label:"Market",
+},
+{
+  values:"Recreation center",
+  label:"Recreation center",
+}
+]
+
+
+
 const healthFacilityHowLongs =[
   {
   values:"less than 30 minutes round trip",
@@ -229,17 +274,24 @@ const villages=useSelector((state)=>state.getVillages)
 const addSchool=useSelector((state)=>state.addSchool);
 const addHouseHold=useSelector((state)=>state.addHouseHold);
 const addHealthFacility=useSelector((state)=>state.addHealthFacility)
+const addPublicPlace=useSelector((state)=>state.addPublicPlace)
 const [openSuccess, setOpenSuccess] = React.useState(false);
 const [open, setOpen] = React.useState(false);
   const [role,setRole]=useState('')
   const [onpentSchool,setOpentSchool]=useState(false)
   const [openHouseHold,setOpenHouseHold]=useState(false)
   const [openHealthFacility,setOpenHealthFacility]=useState(false)
-  const [provincesData,setProvincesData]=useState('')
-  const [provinceName,setProvinceName]=useState('');
+  const [openPublicPlace,setOpenPublicPlace]=useState(false)
+
+
   const [provinceId,setProvinceId]=useState('');
   const [districtData,setDistrictData]=useState([]);
- const [districtName ,setDistrictName]=useState('')
+
+  //publicplace
+  const [publicPlaceName,setPublicPlaceName]=useState('')
+  const [publicPlaceHowLong,setPublicPlaceHowLong]=useState('')
+  const [publicPlaceSource,setPublicPlaceSource]=useState('')
+  const [publicPlaceType,setPublicPlaceType]=useState('') 
   //schoool
   const [schoolName,setSchoolName]=useState('')
   const [schoolSource,setSchoolSource]=useState('')
@@ -254,12 +306,138 @@ const [open, setOpen] = React.useState(false);
   const [totalNumberOfSchool,setTotalNumberOfSchool]=useState('')
   const [totalNumberOfHouseHold,setTotalNumberOfHouseHold]=useState('');
   const [totalNumberOfHealthfacility,setTotalNumberOfHealthfacility]=useState('')
+  const [totalNumberofPublicPlace,setTotalNumberofPublicPlace]=useState('')
   //health facility
 const [healthfacilityType,setHealthfacilityType]=useState('')
 const [healthfacilityHowLong,setHealthfacilityHowLong]=useState('')
 const [healthfacilitySource,setHealthfacilitySource]=useState('')
 const [healthfacilityName,setHealthfacilityName]=useState('')
+//filtering //////////////////////////////////////////////////////////////////////
 
+const [province,setProvince]=useState('')
+const [provinceName,setProvinceName]=useState('')
+const [provincesData,setProvincesData]=useState([]);
+
+const [districtsData,setDistrictsData]=useState([]); 
+const [district,setDistrict]=useState('')
+const [districtName,setDistrictName]=useState('')
+
+const [sectorsData,setSectorsData]=useState([]);
+const  [sector,setSector]=useState('')
+const [sectorName,setSectorName]=useState('');
+
+const [cellsData,setCellsData]=useState([]);
+const [cell,setCell]=useState('');
+const [cellName,setCellName]=useState('')
+
+const [ villagesData,setVillagesData]=useState([])
+const [village,setVillage]=useState('')
+const [villageName,setVillageName]=useState('')
+
+useEffect(()=>{
+  async function fetchProvinces(){
+await axios.get('http://localhost:8000/api/provinces').then((response)=>{
+  setProvincesData(response.data.data)
+  console.log("province ::",provincesData )
+}).catch((error)=>{
+  console.log(error)
+})}
+  
+  fetchProvinces()
+},[])
+
+console.log("province name::",provincesData ,provinceName,districtName,sectorName,cellName,villageName)
+const handleChange =async (event) => {
+  setProvince(event.target.value);
+  provincesData.map((p)=>{
+    if(p.id===event.target.value){
+      setProvinceName(p.Provinces)
+      
+    }
+  })
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/districts/${event.target.value}`).then((response)=>{
+          setDistrictsData(response.data.data)
+}).catch((error)=>{
+  console.log(error)
+})
+  }
+ 
+};
+
+
+const handleDistrictChange =async (event) => {
+  setDistrict(event.target.value);
+  districtsData.map((p)=>{
+    if(p.id===event.target.value){
+      setDistrictName(p.Districts)   
+    }
+  });
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/sectors/${event.target.value}`).then((response)=>{
+          setSectorsData(response.data.data)
+          
+}).catch((error)=>{
+  console.log(error)
+})}
+
+
+};
+
+
+
+
+const handleSectorChange =async (event) => {
+  setSector(event.target.value);
+  sectorsData.map((p)=>{
+    if(p.id===event.target.value){
+      setSectorName(p.Sectors)   
+    }
+  });
+   if(event.target.value){
+       await axios.get(`http://localhost:8000/api/cells/${event.target.value}`).then((response)=>{
+           setCellsData(response.data.data)
+        
+}).catch((error)=>{
+   console.log(error)
+})}
+
+};
+
+
+const handleCellChange =async (event) => {
+  setCell(event.target.value);
+  cellsData.map((p)=>{
+    if(p.id===event.target.value){
+      setCellName(p.Cells)
+      
+    }
+  })
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/villages/${event.target.value}`).then((response)=>{
+          setVillagesData(response.data.data);  
+          setVillage(event.target.value);
+    
+}).catch((error)=>{
+  console.log(error)
+})}
+
+};
+
+const handleVillageChange =async (event) => {
+  setVillage(event.target.value);
+  villagesData.map((p)=>{
+    if(p.id===event.target.value){
+      setVillageName(p.villages)
+      
+    }
+  })
+
+};
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
 
   useEffect(() => {
     const auth=localStorage.getItem("wmsAuth")
@@ -277,14 +455,17 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
       }
     })
     await dispatch(getDistrictsAction(e.target.value))
-    districts.details.map((d)=>{
-      if(d.id==e.target.value){
-        setDistrictName(d.Districts)
-      }
-    })
+    if(districts.details){
+      districts.details.map((d)=>{
+        if(d.id==e.target.value){
+          setDistrictName(d.Districts)
+        }
+      })
+    }
+   
   }
   const handleSaveHealthFacility=async ()=>{
-    await dispatch(addHealthFacilityAction({provinceName,districtName,healthfacilityType,healthfacilityName,healthfacilitySource,healthfacilityHowLong} ))
+    await dispatch(addHealthFacilityAction({provinceName,districtName,sectorName,cellName,villageName ,healthfacilityType,healthfacilityName,healthfacilitySource,healthfacilityHowLong} ))
     if(addHealthFacility.error){
       setOpen(true)
     }
@@ -293,9 +474,7 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
     }
   }
   const handleSaveHouseHold=async()=>{
-    
-    console.log("data..kkk..ll..",provinceName,districtName ,householdPhone,householdSource,householdFrequency,householdHowLong)
-  await dispatch(addHouseHoldAction({provinceName,districtName ,householdPhone,householdSource,householdFrequency,householdHowLong}))
+  await dispatch(addHouseHoldAction({provinceName,districtName,sectorName,cellName,villageName  ,householdPhone,householdSource,householdFrequency,householdHowLong}))
   if(addHouseHold.error){
     setOpen(true)
   }
@@ -308,7 +487,7 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
   const handleSaveSchool=async()=>{
     
     //console.log("data..kkk..ll..",provinceName,districtName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel)
-  await dispatch(addSchoolAction({provinceName,districtName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel}))
+  await dispatch(addSchoolAction({provinceName,districtName,sectorName,cellName,villageName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel}))
   if(addSchool.error){
     setOpen(true)
   }
@@ -317,10 +496,30 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
   }
 
 }
-  const handleDistrict=async()=>{
-
+const handleSavePublicPlace=async()=>{
+  await dispatch(addPublicPlaceAction({provinceName,districtName,sectorName,cellName,villageName ,publicPlaceName,publicPlaceSource,publicPlaceType,publicPlaceHowLong}))
+  if(addPublicPlace.error){
+    setOpen(true)
   }
+  if(addPublicPlace.schools){
+    setOpenSuccess(true)
+  }
+
+}
+
   useEffect(()=>{
+    async function fetchPublicPlaceData() {
+      const url=`http://localhost:8000/api/publicplaces`
+   
+      await axios.get(url)
+      .then(function (response) {
+        console.log(response.data);
+        setTotalNumberofPublicPlace(response.data.data.length)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
     async function fetchSchoolData() {
       const url=`http://localhost:8000/api/schools/`
    
@@ -359,28 +558,17 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
     }
     fetchHouseHoldData() 
     fetchSchoolData();
-    fetchHealthFacility()
+    fetchHealthFacility();
+    fetchPublicPlaceData() ;
   },[])
  
   useEffect(() => {
-    async function fetchData() {
-      await dispatch(getProvincesAction())
-      if (!provinces.loading) {
-        if (provinces.details) {
-          setProvincesData(provinces.details)
-        }       
-    }
-    if(!districts.loading){
-      if(districts.details){
-        setDistrictData(districts.details)
-      }
-    }
-  }
-    fetchData();
+    
+    // fetchData();
     getData();
     getDataHouseHold();
     getDataHealthFacilities()
-  },[!provinces.details,!districts.details]);
+  },[]);
 
 
   const [pieData, setPieData] = useState([]);
@@ -525,11 +713,18 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
   const handleOpenHealthFacility=()=>{
     setOpenHealthFacility(true)
   }
+  const handleOpenPublicPlace=()=>{
+    setOpenPublicPlace(true)
+  }
+
+
+
 
   const handleClose = () => {
     setOpentSchool(false);
     setOpenHouseHold(false);
     setOpenHealthFacility(false)
+    setOpenPublicPlace(false)
   
   };
 
@@ -601,56 +796,113 @@ const [healthfacilityName,setHealthfacilityName]=useState('')
         variant="standard"
       />
     
+      <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+      
+      <div>
+        <TextField
+          id="standard-select-currency"
+          select
+          label=""
+          value={province}
+          name={province}
+          onChange={handleChange}
+          helperText="Please select your province"
+          variant="standard"
+        >
+          {provincesData.map((option) => (
+            <MenuItem key={option.id} value={option.id} name={option.Provinces} >
+              {option.Provinces}
+            </MenuItem>
+          ))}
+        </TextField>
+        
+          <TextField
+          id="standard-select-currency-native"
+          select
+          label=""
+          value={district}
+          name={district}
+          onChange={handleDistrictChange}
+          SelectProps={{
+            native: true,
+          }}
+          helperText="Please select your district"
+          variant="standard"
+        >
+          {districtsData.map((option) => (
+            <option key={option.id} value={option.id} name={option.Districts}>
+              {option.Districts}
+            </option>
+          ))}
+        </TextField>
+      
+        <TextField
+        id="standard-select-currency-native"
+        select
+        label=""
+        value={sector}
+        name={sector}
+        onChange={handleSectorChange}
+        SelectProps={{
+          native: true,
+        }}
+        helperText="Please select your sector"
+        variant="standard"
+      >
+        {sectorsData.map((option) => (
+          <option key={option.id} value={option.id} name={option.Sectors}>
+            {option.Sectors}
+          </option>
+        ))}
+      </TextField>
       <TextField
-      id="outlined-select-currency-native"
+      id="standard-select-currency-native"
       select
-      label="Select "
-     // value={role}
-     // name="role"
-      fullWidth
-      required
-      variant="standard"
-      onChange={(e)=>handleOnChange(e)
-        }
-     onKeyPress={handleDistrict}
+      label=""
+      value={cell}
+      name={cell}
+      onChange={handleCellChange}
       SelectProps={{
         native: true,
-      }} 
-    >
-      {provinces.details.map((option) => (
-        <option key={option.id} value={option.id}  >
-        
-          {option.Provinces}
-        </option>
-      ))}
-    </TextField>
-    {
-      !districts.details.length?null:
-      <TextField
-      id="outlined-select-currency-native"
-      select
-      label="Select "
-     // value={role}
-     // name="role"
-      fullWidth
-      required
+      }}
+      helperText="Please select your cell"
       variant="standard"
-      onChange={(e)=>handleOnChange(e)
-        }
-     onKeyPress={handleDistrict}
-      SelectProps={{
-        native: true,
-      }} 
     >
-      {districts.details.map((option) => (
-        <option key={option.id} value={option.id}  >
-        
-          {option.Districts}
+      {cellsData.map((option) => (
+        <option key={option.id} value={option.id} name={option.Cells}>
+          {option.Cells}
         </option>
       ))}
     </TextField>
 
-     }
+    <TextField
+    id="standard-select-currency-native"
+    select
+    label=""
+    value={village}
+    name={village}
+    onChange={handleVillageChange}
+    SelectProps={{
+      native: true,
+    }}
+    helperText="Please select your village"
+    variant="standard"
+  >
+    {villagesData.map((option) => (
+      <option key={option.id} value={option.id} name={option.villages}>
+        {option.villages}
+      </option>
+    ))}
+  </TextField>
+      </div>
+    </Box>
    
 
       <Typography variant="h6" gutterBottom>
@@ -800,60 +1052,116 @@ native: true,
             variant="standard"
           />
         
-          <TextField
-          id="outlined-select-currency-native"
+          <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+      
+      <div>
+        <TextField
+          id="standard-select-currency"
           select
-          label="Select "
-         // value={role}
-         // name="role"
-          fullWidth
-          required
+          label=""
+          value={province}
+          name={province}
+          onChange={handleChange}
+          helperText="Please select your province"
           variant="standard"
-          onChange={(e)=>handleOnChange(e)
-            }
-         onKeyPress={handleDistrict}
-          SelectProps={{
-            native: true,
-          }} 
         >
-          {provinces.details.map((option) => (
-            <option key={option.id} value={option.id}  >
-            
+          {provincesData.map((option) => (
+            <MenuItem key={option.id} value={option.id} name={option.Provinces} >
               {option.Provinces}
-            </option>
+            </MenuItem>
           ))}
         </TextField>
-        {
-          !districts.details.length?null:
+        
           <TextField
-          id="outlined-select-currency-native"
+          id="standard-select-currency-native"
           select
-          label="Select "
-         // value={role}
-         // name="role"
-          fullWidth
-          required
-          variant="standard"
-          onChange={(e)=>handleOnChange(e)
-            }
-         onKeyPress={handleDistrict}
+          label=""
+          value={district}
+          name={district}
+          onChange={handleDistrictChange}
           SelectProps={{
             native: true,
-          }} 
+          }}
+          helperText="Please select your district"
+          variant="standard"
         >
-          {districts.details.map((option) => (
-            <option key={option.id} value={option.id}  >
-            
+          {districtsData.map((option) => (
+            <option key={option.id} value={option.id} name={option.Districts}>
               {option.Districts}
             </option>
           ))}
         </TextField>
-  
-         }
-       
+      
+        <TextField
+        id="standard-select-currency-native"
+        select
+        label=""
+        value={sector}
+        name={sector}
+        onChange={handleSectorChange}
+        SelectProps={{
+          native: true,
+        }}
+        helperText="Please select your sector"
+        variant="standard"
+      >
+        {sectorsData.map((option) => (
+          <option key={option.id} value={option.id} name={option.Sectors}>
+            {option.Sectors}
+          </option>
+        ))}
+      </TextField>
+      <TextField
+      id="standard-select-currency-native"
+      select
+      label=""
+      value={cell}
+      name={cell}
+      onChange={handleCellChange}
+      SelectProps={{
+        native: true,
+      }}
+      helperText="Please select your cell"
+      variant="standard"
+    >
+      {cellsData.map((option) => (
+        <option key={option.id} value={option.id} name={option.Cells}>
+          {option.Cells}
+        </option>
+      ))}
+    </TextField>
 
+    <TextField
+    id="standard-select-currency-native"
+    select
+    label=""
+    value={village}
+    name={village}
+    onChange={handleVillageChange}
+    SelectProps={{
+      native: true,
+    }}
+    helperText="Please select your village"
+    variant="standard"
+  >
+    {villagesData.map((option) => (
+      <option key={option.id} value={option.id} name={option.villages}>
+        {option.villages}
+      </option>
+    ))}
+  </TextField>
+      </div>
+    </Box>
+   
           <Typography variant="h6" gutterBottom>
-            1.	What is the type of the school? (select on that applies): 
+            1. Is drinking water from the main source currently available at the school?
            </Typography>
             <TextField
           id="outlined-select-currency-native"
@@ -926,7 +1234,8 @@ native: true,
   ))}
 </TextField>
 <Typography variant="h6" gutterBottom>
-4.	Is drinking water from the main source currently available at the school?
+
+4. What is the type of the school? (select on that applies): 
    </Typography>
     <TextField
   id="outlined-select-currency-native"
@@ -957,6 +1266,7 @@ native: true,
           </Button>
         </DialogActions>
       </Dialog>
+
       <Dialog open={openHouseHold} onClose={handleClose}>
       <DialogTitle>HouseHold information</DialogTitle>
       <DialogContent>
@@ -1021,58 +1331,114 @@ native: true,
           fullWidth
           variant="standard"
         />
+        <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+      
+      <div>
         <TextField
-        id="outlined-select-currency-native"
+          id="standard-select-currency"
+          select
+          label=""
+          value={province}
+          name={province}
+          onChange={handleChange}
+          helperText="Please select your province"
+          variant="standard"
+        >
+          {provincesData.map((option) => (
+            <MenuItem key={option.id} value={option.id} name={option.Provinces} >
+              {option.Provinces}
+            </MenuItem>
+          ))}
+        </TextField>
+        
+          <TextField
+          id="standard-select-currency-native"
+          select
+          label=""
+          value={district}
+          name={district}
+          onChange={handleDistrictChange}
+          SelectProps={{
+            native: true,
+          }}
+          helperText="Please select your district"
+          variant="standard"
+        >
+          {districtsData.map((option) => (
+            <option key={option.id} value={option.id} name={option.Districts}>
+              {option.Districts}
+            </option>
+          ))}
+        </TextField>
+      
+        <TextField
+        id="standard-select-currency-native"
         select
-        label="Select "
-       // value={role}
-       // name="role"
-        fullWidth
-        required
-        variant="standard"
-        onChange={(e)=>handleOnChange(e)
-          }
-       onKeyPress={handleDistrict}
+        label=""
+        value={sector}
+        name={sector}
+        onChange={handleSectorChange}
         SelectProps={{
           native: true,
-        }} 
+        }}
+        helperText="Please select your sector"
+        variant="standard"
       >
-        {provinces.details.map((option) => (
-          <option key={option.id} value={option.id}  >
-          
-            {option.Provinces}
+        {sectorsData.map((option) => (
+          <option key={option.id} value={option.id} name={option.Sectors}>
+            {option.Sectors}
           </option>
         ))}
       </TextField>
-      {
-        !districts.details.length?null:
-        <TextField
-        id="outlined-select-currency-native"
-        select
-        label="Select "
-       // value={role}
-       // name="role"
-        fullWidth
-        required
-        variant="standard"
-        onChange={(e)=>handleOnChange(e)
-          }
-       onKeyPress={handleDistrict}
-        SelectProps={{
-          native: true,
-        }} 
-      >
-        {districts.details.map((option) => (
-          <option key={option.id} value={option.id}  >
-          
-            {option.Districts}
-          </option>
-        ))}
-      </TextField>
+      <TextField
+      id="standard-select-currency-native"
+      select
+      label=""
+      value={cell}
+      name={cell}
+      onChange={handleCellChange}
+      SelectProps={{
+        native: true,
+      }}
+      helperText="Please select your cell"
+      variant="standard"
+    >
+      {cellsData.map((option) => (
+        <option key={option.id} value={option.id} name={option.Cells}>
+          {option.Cells}
+        </option>
+      ))}
+    </TextField>
 
-       }
-     
-
+    <TextField
+    id="standard-select-currency-native"
+    select
+    label=""
+    value={village}
+    name={village}
+    onChange={handleVillageChange}
+    SelectProps={{
+      native: true,
+    }}
+    helperText="Please select your village"
+    variant="standard"
+  >
+    {villagesData.map((option) => (
+      <option key={option.id} value={option.id} name={option.villages}>
+        {option.villages}
+      </option>
+    ))}
+  </TextField>
+      </div>
+    </Box>
+   
         <Typography variant="h6" gutterBottom>
           	1.	Where did the household collect water in the past 6 months?
          </Typography>
@@ -1148,7 +1514,6 @@ SelectProps={{
   </option>
 ))}
 </TextField>
-
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
@@ -1157,6 +1522,270 @@ SelectProps={{
         </Button>
       </DialogActions>
     </Dialog>
+
+    <Dialog open={openPublicPlace} onClose={handleClose}>
+      <DialogTitle>Public Place information</DialogTitle>
+      <DialogContent>
+        <DialogContentText>
+          please provide Public Place unformation. We
+          will send updates occasionally.
+        </DialogContentText>
+        {
+          !addPublicPlace.error? null:
+           <Collapse in={open}>
+           <Alert
+           severity="error"
+             action={
+               <IconButton
+                 aria-label="close"
+                 color="inherit"
+                 size="small"
+                 onClick={handleClose}
+               
+               >
+                 <CloseIcon fontSize="inherit" />
+               </IconButton>
+             }
+             sx={{ mb: 0.2 }}
+           >
+            {addPublicPlace.error}
+           </Alert>
+         </Collapse>
+        }    
+        {
+          addPublicPlace.details? <Collapse in={openSuccess}>
+          <Alert
+          severity="success"
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={handleClose}
+              
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+            sx={{ mb: 0.2 }}
+          >
+           {addPublicPlace.details}
+          </Alert>
+        </Collapse>:null
+        }
+       
+        <TextField
+          autoFocus
+          margin="dense"
+          id="publicPlaceName"
+          name="publicPlaceName"
+         onChange={(e)=>setPublicPlaceName(e.target.value)}
+          value={publicPlaceName}
+          label="Name"
+          required
+          type="text"
+          fullWidth
+          variant="standard"
+        />
+        <Box
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1, width: '25ch' },
+      }}
+      noValidate
+      autoComplete="off"
+    >
+      
+      <div>
+        <TextField
+          id="standard-select-currency"
+          select
+          label=""
+          value={province}
+          name={province}
+          onChange={handleChange}
+          helperText="Please select your province"
+          variant="standard"
+        >
+          {provincesData.map((option) => (
+            <MenuItem key={option.id} value={option.id} name={option.Provinces} >
+              {option.Provinces}
+            </MenuItem>
+          ))}
+        </TextField>
+        
+          <TextField
+          id="standard-select-currency-native"
+          select
+          label=""
+          value={district}
+          name={district}
+          onChange={handleDistrictChange}
+          SelectProps={{
+            native: true,
+          }}
+          helperText="Please select your district"
+          variant="standard"
+        >
+          {districtsData.map((option) => (
+            <option key={option.id} value={option.id} name={option.Districts}>
+              {option.Districts}
+            </option>
+          ))}
+        </TextField>
+      
+        <TextField
+        id="standard-select-currency-native"
+        select
+        label=""
+        value={sector}
+        name={sector}
+        onChange={handleSectorChange}
+        SelectProps={{
+          native: true,
+        }}
+        helperText="Please select your sector"
+        variant="standard"
+      >
+        {sectorsData.map((option) => (
+          <option key={option.id} value={option.id} name={option.Sectors}>
+            {option.Sectors}
+          </option>
+        ))}
+      </TextField>
+      <TextField
+      id="standard-select-currency-native"
+      select
+      label=""
+      value={cell}
+      name={cell}
+      onChange={handleCellChange}
+      SelectProps={{
+        native: true,
+      }}
+      helperText="Please select your cell"
+      variant="standard"
+    >
+      {cellsData.map((option) => (
+        <option key={option.id} value={option.id} name={option.Cells}>
+          {option.Cells}
+        </option>
+      ))}
+    </TextField>
+
+    <TextField
+    id="standard-select-currency-native"
+    select
+    label=""
+    value={village}
+    name={village}
+    onChange={handleVillageChange}
+    SelectProps={{
+      native: true,
+    }}
+    helperText="Please select your village"
+    variant="standard"
+  >
+    {villagesData.map((option) => (
+      <option key={option.id} value={option.id} name={option.villages}>
+        {option.villages}
+      </option>
+    ))}
+  </TextField>
+      </div>
+    </Box>
+   
+        <Typography variant="h6" gutterBottom>
+          	1. What is the type of the public place? (select one that applies):
+            
+         </Typography>
+          <TextField
+        id="outlined-select-currency-native"
+        select
+        label="Select "
+       value={publicPlaceType}
+        name="publicPlaceType"
+        fullWidth
+        required
+        variant="standard"
+       onChange={(e)=>setPublicPlaceType(e.target.value)}
+        SelectProps={{
+          native: true,
+        }}
+       
+      >
+        {publicPlaceTypes.map((option) => (
+          <option key={option.values} value={option.values}>
+            {option.label}
+          </option>
+        ))}
+      </TextField>
+
+      <Typography variant="h6" gutterBottom>
+      2.	What is the main source of water provided by the HF?
+     </Typography>
+      <TextField
+    id="outlined-select-currency-native"
+    select
+    label="Select..."
+   value={publicPlaceSource}
+    name="publicPlaceSource"
+    fullWidth
+    required
+    variant="standard"
+    onChange={(e)=>setPublicPlaceSource(e.target.value)}
+    SelectProps={{
+      native: true,
+    }}
+   
+  >
+    {publicPlaceSources.map((option) => (
+      <option key={option.values} value={option.values}>
+        {option.label}
+      </option>
+    ))}
+  </TextField>
+  <Typography variant="h6" gutterBottom>
+
+  3.	Approximatively, how long did it take for members to get there and come back from where they collected water?
+
+ </Typography>
+  <TextField
+id="outlined-select-currency-native"
+select
+label="Select "
+ value={publicPlaceHowLong}
+name="publicPlaceHowLong"
+fullWidth
+required
+variant="standard"
+onChange={(e)=>setPublicPlaceHowLong(e.target.value)}
+SelectProps={{
+  native: true,
+}}
+
+>
+{publicPlaceHowLongs.map((option) => (
+  <option key={option.values} value={option.values}>
+    {option.label}
+  </option>
+))}
+</TextField>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={handleSavePublicPlace} >
+        {addPublicPlace.loading?"loading":"Save"}
+        </Button>
+      </DialogActions>
+    </Dialog>
+
+    
+
+
+
+
+    
 
     <Page title="Dashboard">
       <Container maxWidth="xl">
@@ -1189,6 +1818,7 @@ SelectProps={{
               <Paper key="" variant="outlined" sx={{ py: 2.5, textAlign: 'center' }}>
             <Button
             sx={{ py: 2.5, textAlign: 'center' }}
+            onClick={handleOpenPublicPlace}
             >
                 {/* <Box sx={{ mb: 0.5 }}>icon</Box> */}
                 <Typography variant="h6">Public Place</Typography>
@@ -1234,7 +1864,7 @@ SelectProps={{
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Pabluci Place" total={17} color="warning" />
+          <AppWidgetSummary title="Pabluci Place" total={totalNumberofPublicPlace} color="warning" />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>

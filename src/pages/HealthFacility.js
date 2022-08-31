@@ -139,23 +139,42 @@ export default function School() {
  const [search, setSearch] = useState(false);
  const [openFeedBack,setOpenFeedBack]=useState(false)
 const [schoolId,setSchoolId]=useState('')
-const [textMessage,setTextMessage]=useState('');
+
 
 const {healthfacilitiesData,setHealthfacilitiesData}=useState('')
 const [errorMessage,setErrorMessage]=useState('')
+ const [textMessage,setTextMessage]=useState('');
+ const [healthFacilityId,setHealthFacilityId]=useState('')
+
  const handleFeedBack=(id)=>{
-  setSchoolId(id)
-  setOpenFeedBack(true)
- }
+  setHealthFacilityId(id)
+    setOpenFeedBack(true)
+   }
 
-
-
+   const handleSentMessage=async(id)=>{
+    const url=`http://localhost:8000/api/messages`
+    await axios.post(url, {
+      message:textMessage,
+      ref_id:healthFacilityId
+    })
+     .then(function (response) {
+       console.log(response.data);
+        setErrorMessage(response.data.message)
+      
+     
+     })
+     .catch(function (error) {
+      setErrorMessage(error.response.data.message)
+       console.log(error.response.data.message);
+     });
+  }
+  
 const handleAproveHealthFacility=async(id)=>{
     const url=`http://localhost:8000/api/healthfacilities/approvehealthfacility/${id}`
     await axios.put(url, {})
-    .then(function (response) {
+    .then(async function (response) {
       console.log(response.data);
-       dispatch(getHealthfacilitiesAction())
+      await dispatch(getHealthfacilitiesAction())
     })
     .catch(function (error) {
       console.log(error);
@@ -165,9 +184,9 @@ const handleAproveHealthFacility=async(id)=>{
     const handleRejectHealthfacility=async(id)=>{
         const url=`http://localhost:8000/api/healthfacilities/rejecthealthfacility/${id}`
        await axios.put(url, {})
-        .then(function (response) {
+        .then(async function (response) {
           console.log(response.data);
-          dispatch(getHealthfacilitiesAction())
+          await dispatch(getHealthfacilitiesAction())
         })
         .catch(function (error) {
           console.log(error);
@@ -175,23 +194,7 @@ const handleAproveHealthFacility=async(id)=>{
         }
     
 
-  const handleSentMessage=async(id)=>{
-    const url=`http://localhost:8000/api/messages`
-    await axios.post(url, {
-      message:textMessage,
-      ref_id:schoolId
-    })
-     .then(function (response) {
-       console.log(response.data);
-        setErrorMessage(response.data.message)
-       
-     
-     })
-     .catch(function (error) {
-      setErrorMessage(error.response.data.message)
-       console.log(error.response.data.message);
-     });
-  }
+  
   console.log(',,,,',getHealthfacilities.details)
  useEffect(() => {
   async function fetchData() {

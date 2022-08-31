@@ -12,6 +12,9 @@ console.log("ooppp",details)
    // provinceName,districtName ,schoolName,schoolSource,schoolFrequency,schoolHowLong,schoolLevel
     const {provinceName}=details
     const {districtName}=details
+    const {sectorName}=details
+    const {cellName}=details
+    const {villageName}=details
     const {healthfacilityName}=details
    const  {healthfacilitySource}=details
     const {healthfacilityType}=details
@@ -24,7 +27,11 @@ console.log("ooppp",details)
     type:healthfacilityType,
     how_long:healthfacilityHowLong, 
     prov_name:provinceName,
-    dis_name:districtName
+    dis_name:districtName,
+    sec_name:sectorName,
+    cell_name:cellName,
+    vil_name:villageName
+
    });
     const {data} = await res;
    console.log(data)

@@ -127,7 +127,7 @@ export default function School() {
   const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
   const [role, setRole] = React.useState('User');
   const [usersDetails,setUsersDetails]=useState('')
-  const [schoolsDetails,setSchoolsDetails]=useState([])
+  
  const dispatch=useDispatch();
  const getAllUsers=useSelector((state)=>state.getUsers);
  const getSchools=useSelector((state)=>state.getSchools);
@@ -138,9 +138,10 @@ export default function School() {
  const [search, setSearch] = useState(false);
  const [openFeedBack,setOpenFeedBack]=useState(false)
 const [schoolId,setSchoolId]=useState('')
-const [textMessage,setTextMessage]=useState('');
 
+const [schoolsDetails,setSchoolsDetails]=useState([])
 const [errorMessage,setErrorMessage]=useState('')
+const [textMessage,setTextMessage]=useState('');
  const handleFeedBack=(id)=>{
   setSchoolId(id)
   setOpenFeedBack(true)
@@ -150,8 +151,9 @@ const [errorMessage,setErrorMessage]=useState('')
 const handleAproveSchool=async(id)=>{
 const url=`http://localhost:8000/api/schools/approve-school/${id}`
 await axios.put(url, {})
-.then(function (response) {
+.then(async function (response) {
   console.log(response.data);
+  await dispatch(getALLSchools())
 })
 .catch(function (error) {
   console.log(error);
@@ -160,13 +162,15 @@ await axios.put(url, {})
 const handleRejectSchool=async(id)=>{
   const url=`http://localhost:8000/api/schools/reject-school/${id}`
  await axios.put(url, {})
-  .then(function (response) {
+  .then(async function (response) {
     console.log(response.data);
+    await dispatch(getALLSchools())
   })
   .catch(function (error) {
     console.log(error);
   });
   }
+  
   const handleSentMessage=async(id)=>{
     const url=`http://localhost:8000/api/messages`
     await axios.post(url, {
@@ -176,7 +180,7 @@ const handleRejectSchool=async(id)=>{
      .then(function (response) {
        console.log(response.data);
         setErrorMessage(response.data.message)
-       
+      
      
      })
      .catch(function (error) {
@@ -184,18 +188,34 @@ const handleRejectSchool=async(id)=>{
        console.log(error.response.data.message);
      });
   }
+  const getALLSchools=async()=>{
+    const url=`http://localhost:8000/api/schools/`
+    await axios.get(url)
+     .then(function (response) {
+       console.log("hello schools",response.data.data);
+       setSchoolsDetails(response.data.data)
+       
+     
+     })
+     .catch(function (error) {
+    
+       console.log(error.response.data.message);
+     });
+  }
+
  useEffect(() => {
+  getALLSchools();
   async function fetchData() {
    // await dispatch(getUsersAction())
-    await dispatch(getSchoolsAction())
-    if (!getSchools.loading) {
-      if (getSchools.details) {
-        setSchoolsDetails(getSchools.details)
-      }
-    }
+    // await dispatch(getSchoolsAction())
+    // if (!getSchools.loading) {
+    //   if (getSchools.details) {
+    //     setSchoolsDetails(getSchools.details)
+    //   }
+    // }
   }
   fetchData();
-}, [getSchools.details]);
+}, []);
   const handleChange = (event) => {
     setRole(event.target.value);
   };
@@ -361,7 +381,7 @@ const handleRejectSchool=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-              {details.status==="Pending"?
+             
             <React.Fragment>
             <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
@@ -399,15 +419,13 @@ const handleRejectSchool=async(id)=>{
       
               
                 </TableCell>
-            </React.Fragment>:
-            null
-            
-            }
+            </React.Fragment>
                 
               </TableRow>
               ))}
               </React.Fragment>
             ):(
+              
               <React.Fragment>
               {schoolsDetails.slice(0, limit).map((details) => (
               <TableRow
@@ -415,9 +433,11 @@ const handleRejectSchool=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-              {details.status==="Pending"?
-              <React.Fragment>
-              <TableCell align="center">{details.name}</TableCell>
+              
+            
+         
+            <React.Fragment>
+                <TableCell align="center">{details.name}</TableCell>
                   <TableCell component="th" scope="row">
                     {details.source}
                   </TableCell>
@@ -453,11 +473,9 @@ const handleRejectSchool=async(id)=>{
         
                 
                   </TableCell>
-              </React.Fragment>:
-              null
-              
-              }
+              </React.Fragment>
                   
+            
               </TableRow>
               ))}
               </React.Fragment>

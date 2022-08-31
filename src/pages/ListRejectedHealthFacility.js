@@ -142,10 +142,8 @@ export default function School() {
  const [selectedExamIds, setSelectedExamIds] = useState([]);
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
+ const [textMessage,setTextMessage]=useState('')
 
- const handleFeedBack=(id)=>{
-    setOpenFeedBack(true)
-   }
    const todaydate=new Date().toISOString().slice(0,10);
    const generateListOfApprovedHealthfacilities =()=> {
     const doc = new jsPdf();
@@ -196,7 +194,20 @@ export default function School() {
   };
   
   
-
+  const handleFeedBack=async(id)=>{
+    console.log("idd",id)
+    const url=`http://localhost:8000/api/messages/${id}`
+    await axios.get(url)
+    .then(function (response) {
+      console.log(response.data);
+      setTextMessage(response.data.data.message)
+    
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+    setOpenFeedBack(true)
+   }
 
  useEffect(() => {
   async function fetchData() {
@@ -217,6 +228,7 @@ export default function School() {
 
   const handleClose = () => {
     setOpen(false);
+    setTextMessage('')
     setOpenFeedBack(false)
   };
 
@@ -273,7 +285,7 @@ export default function School() {
   return (
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
-    <DialogTitle>Provide feedbak</DialogTitle>
+    <DialogTitle>The information was rejected due to the following reasons:</DialogTitle>
     <Box
     component="form"
     sx={{
@@ -283,26 +295,26 @@ export default function School() {
     autoComplete="off"
   >
     <div>
-    
-      <TextField
-        id="outlined-multiline-static"
-        label="Type Message"
-        multiline
-        rows={4}
-        defaultValue="Message..."
-      />
+    {
+      textMessage?
+      <Typography>
+      {textMessage}
+     </Typography>:null
+    }
+   
     </div>
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
                   <Button onClick={handleClose} >Close</Button>
-
+                
+                 
                 </ButtonGroup>
   </Dialog>
      <Page title="User">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-          List of Approved  HealthFacilities
+          List of Rejected HealthFacilities
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
@@ -342,7 +354,7 @@ export default function School() {
 
   </Box>
         <Table aria-label="caption table">
-          <caption className="textTitle">Household List</caption>
+          <caption className="textTitle">HealthFacilities List</caption>
           {/* <Button
               variant="contained"
               sx={{ backgroundColor: "#F9842C" }}
@@ -356,9 +368,9 @@ export default function School() {
               <TableCell align="center">Name</TableCell>
               <TableCell>Source</TableCell>
               <TableCell align="center">Distance</TableCell>
-              <TableCell align="center">Frequency</TableCell>
+              <TableCell align="center">Type</TableCell>
               <TableCell align="center">Status</TableCell>
-             
+              <TableCell align="center">ACTION</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -381,11 +393,28 @@ export default function School() {
                 </TableCell>
                
                 <TableCell align="center">{details.how_long}</TableCell>
-                <TableCell align="center">{details.frequency}</TableCell>
+                <TableCell align="center">{details.type}</TableCell>
                 <TableCell align="center">{details.status}</TableCell>
                 <TableCell align="center">
 
-               
+                <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  '& > *': {
+                    m: 1,
+                  },
+                }}
+                >
+                
+                <ButtonGroup variant="text" aria-label="text button group">
+                  
+                  <Button onClick={()=>{
+                    handleFeedBack(details.id)
+                  }}>Message</Button>
+                </ButtonGroup>
+                </Box>
       
               
                 </TableCell>
@@ -411,10 +440,29 @@ export default function School() {
             </TableCell>
            
             <TableCell align="center">{details.how_long}</TableCell>
-            <TableCell align="center">{details.frequency}</TableCell>
+            <TableCell align="center">{details.type}</TableCell>
             <TableCell align="center">{details.status}</TableCell>
             <TableCell align="center">
 
+            <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              '& > *': {
+                m: 1,
+              },
+            }}
+            >
+            
+            <ButtonGroup variant="text" aria-label="text button group">
+              
+              <Button onClick={()=>{
+                handleFeedBack(details.id)
+              }}>Message</Button>
+            </ButtonGroup>
+            </Box>
+  
           
             </TableCell>
             </React.Fragment>:null

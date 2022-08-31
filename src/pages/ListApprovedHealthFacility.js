@@ -360,7 +360,7 @@ export default function School() {
               <TableCell align="center">Name</TableCell>
               <TableCell>Source</TableCell>
               <TableCell align="center">Distance</TableCell>
-              <TableCell align="center">Frequency</TableCell>
+              <TableCell align="center">Type</TableCell>
               <TableCell align="center">Status</TableCell>
             </TableRow>
           </TableHead>
@@ -383,7 +383,7 @@ export default function School() {
                 </TableCell>
                
                 <TableCell align="center">{details.how_long}</TableCell>
-                <TableCell align="center">{details.frequency}</TableCell>
+                <TableCell align="center">{details.type}</TableCell>
                 <TableCell align="center">{details.status}</TableCell>
                 <TableCell align="center">
 
@@ -413,7 +413,7 @@ export default function School() {
             </TableCell>
            
             <TableCell align="center">{details.how_long}</TableCell>
-            <TableCell align="center">{details.frequency}</TableCell>
+            <TableCell align="center">{details.type}</TableCell>
             <TableCell align="center">{details.status}</TableCell>
             <TableCell align="center">
 
