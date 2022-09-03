@@ -47,35 +47,15 @@ import USERLIST from '../_mock/user';
 
 import { getUsersAction } from "../redux/actions/getUsersAction"
 import { getSchoolsAction } from '../redux/actions/schoolsAction';
+import { getHouseholdsAction } from '../redux/actions/houseHoldAction';
+import { getPublicPlacesAction } from '../redux/actions/publicPlaceAction';
+
+import moment from "moment";
+import jsPdf from "jspdf";
+import autoTable from 'jspdf-autotable';
+import logo from "../components/images/logo.png";
 
 // ----------------------------------------------------------------------
-const roles=[{
-  value:"SuperAdmin",
-  label:"Super Admin"
-},
-{
-  value:"Admin",
-  label:"Admin"
-},
-{
-  value:"User",
-  label:"User"
-},
-{
-  value:"OrganistionLeader",
-  label:"Organistion Leader"
-},
-]
-
-const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'source', label: 'Source', alignRight: false },
-  { id: 'howLong', label: 'Distance', alignRight: false },
-  { id: 'level', label: 'Level', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: 'Action', label: 'Action', alignRight: false },
-  { id: '' },
-];
 
 // ----------------------------------------------------------------------
 
@@ -109,11 +89,6 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function School() {
-  const [value, setValue] = React.useState('Controlled');
-
-  const handleChangeA = (event) => {
-    setValue(event.target.value);
-  };
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -127,95 +102,87 @@ export default function School() {
   const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
   const [role, setRole] = React.useState('User');
   const [usersDetails,setUsersDetails]=useState('')
-  
+  const [ houseHoldsDetails, setHouseHoldsDetails]=useState([])
+  const [ publicPlacesDetails, setPuplicPlacesDetails]=useState([])
  const dispatch=useDispatch();
  const getAllUsers=useSelector((state)=>state.getUsers);
  const getSchools=useSelector((state)=>state.getSchools);
-
+ const getHouseHolds=useSelector((state)=>state.getHouseHolds)
+ const getPublicPlaces=useSelector((state)=>state.getPublicPlaces)
+ const [openFeedBack,setOpenFeedBack]=useState(false)
  const [limit, setLimit] = useState(5);
  const [selectedExamIds, setSelectedExamIds] = useState([]);
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
- const [openFeedBack,setOpenFeedBack]=useState(false)
-const [schoolId,setSchoolId]=useState('')
 
-const [schoolsDetails,setSchoolsDetails]=useState([])
-const [errorMessage,setErrorMessage]=useState('')
-const [textMessage,setTextMessage]=useState('');
  const handleFeedBack=(id)=>{
-  setSchoolId(id)
-  setOpenFeedBack(true)
- }
-
-
-const handleAproveSchool=async(id)=>{
-const url=`http://localhost:8000/api/schools/approve-school/${id}`
-await axios.put(url, {})
-.then(async function (response) {
-  console.log(response.data);
-  await dispatch(getALLSchools())
-})
-.catch(function (error) {
-  console.log(error);
-});
-}
-const handleRejectSchool=async(id)=>{
-  const url=`http://localhost:8000/api/schools/reject-school/${id}`
- await axios.put(url, {})
-  .then(async function (response) {
-    console.log(response.data);
-    await dispatch(getALLSchools())
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-  }
+    setOpenFeedBack(true)
+   }
+   const todaydate=new Date().toISOString().slice(0,10);
+   const generateListOfApprovedPublicPlace =()=> {
+    const doc = new jsPdf();
+    doc.addImage(logo, "JPEG", 20, 5, 40, 40);
+    doc.setFont("Helvertica", "normal");
+    doc.text("Water Management System", 20, 50);
+    doc.text(`MININFRA`, 20, 55);
+    doc.text("Email: info@mininfra.gov.rw", 20, 60);
+    doc.setFont("Helvertica", "normal");
+    doc.text(`Date ${todaydate}`, 140, 65);
+    doc.setFont("Helvertica", "bold");
+    doc.text("Liste of approved Public Place", 70, 75);
+     const tableColumn=['Name','Province','District','Source','status']
+    const tableRows=[]
   
-  const handleSentMessage=async(id)=>{
-    const url=`http://localhost:8000/api/messages`
-    await axios.post(url, {
-      message:textMessage,
-      ref_id:schoolId
-    })
-     .then(function (response) {
-       console.log(response.data);
-        setErrorMessage(response.data.message)
-      
-     
-     })
-     .catch(function (error) {
-      setErrorMessage(error.response.data.message)
-       console.log(error.response.data.message);
-     });
-  }
-  const getALLSchools=async()=>{
-    const url=`http://localhost:8000/api/schools/`
-    await axios.get(url)
-     .then(function (response) {
-       console.log("hello schools",response.data.data);
-       setSchoolsDetails(response.data.data)
+    houseHoldsDetails.map(h =>{
+      const publicPlaceData=[
+        h.name,
+        h.prov_name,
+        h.dis_name,
+        h.source,
+        h.status,
        
-     
-     })
-     .catch(function (error) {
-    
-       console.log(error.response.data.message);
+       // format(new Date(student.updated_at), "yyyy-MM-dd")
+  
+      ];
+       if(h.status==="Approved"){
+      tableRows.push(publicPlaceData);
+       }
+      
+    });
+   
+    doc.autoTable(tableColumn, tableRows, { 
+      startY: 80,
+    theme: "striped",
+    margin: 10,
+    styles: {
+      font: "courier",
+      fontSize: 12,
+      overflow: "linebreak",
+      cellPadding: 3,
+      halign: "center",
+    },
+    head: [tableColumn],
+    body: [tableRows],
      });
-  }
+  const date = Date().split(" ");
+  const dateStr = date[0] + date[1] + date[2] + date[3] + date[4];
+  doc.save(`report_${dateStr}.pdf`);
+  };
+  
 
  useEffect(() => {
-  getALLSchools();
   async function fetchData() {
    // await dispatch(getUsersAction())
-    // await dispatch(getSchoolsAction())
-    // if (!getSchools.loading) {
-    //   if (getSchools.details) {
-    //     setSchoolsDetails(getSchools.details)
-    //   }
-    // }
+   // await dispatch(getHouseholdsAction())
+    await dispatch(getPublicPlacesAction())
+    if (!getPublicPlaces.loading) {
+      if (getPublicPlaces.details) {
+        setPuplicPlacesDetails(getPublicPlaces.details)
+      }
+    }
   }
   fetchData();
-}, []);
+}, [getPublicPlaces.details]);
   const handleChange = (event) => {
     setRole(event.target.value);
   };
@@ -224,8 +191,6 @@ const handleRejectSchool=async(id)=>{
   const handleClose = () => {
     setOpen(false);
     setOpenFeedBack(false)
-    setErrorMessage('')
-    setTextMessage('')
   };
 
 
@@ -257,15 +222,15 @@ const handleRejectSchool=async(id)=>{
     try {
       var results = [];
       const toSearch = trimString(searchKey); // trim it
-      for (var i = 0; i < schoolsDetails.length; i++) {
-        for (var key in schoolsDetails[i]) {
-          if (schoolsDetails[i][key] != null) {
+      for (var i = 0; i < publicPlacesDetails.length; i++) {
+        for (var key in publicPlacesDetails[i]) {
+          if (publicPlacesDetails[i][key] != null) {
             if (
-              schoolsDetails[i][key].toString().toLowerCase().indexOf(toSearch) !=
+                publicPlacesDetails[i][key].toString().toLowerCase().indexOf(toSearch) !=
               -1
             ) {
-              if (!itemExists(results, schoolsDetails[i]))
-                results.push(schoolsDetails[i]);
+              if (!itemExists(results, publicPlacesDetails[i]))
+                results.push(publicPlacesDetails[i]);
             }
           }
         }
@@ -282,14 +247,6 @@ const handleRejectSchool=async(id)=>{
     <React.Fragment>
     <Dialog onClose={handleClose} open={openFeedBack}>
     <DialogTitle>Provide feedbak</DialogTitle>
-    {
-      errorMessage? 
-      <Typography> 
-      {errorMessage}
-    </Typography>
-    :null
-    }
-    
     <Box
     component="form"
     sx={{
@@ -303,18 +260,15 @@ const handleRejectSchool=async(id)=>{
       <TextField
         id="outlined-multiline-static"
         label="Type Message"
-        name="textMessage"
-        value={textMessage}
         multiline
-        onChange={(e)=>setTextMessage(e.target.value)}
         rows={4}
         defaultValue="Message..."
       />
     </div>
   </Box>
     <ButtonGroup variant="text" aria-label="text button group">
-                  <Button onClick={handleClose} >Cancel</Button>
-                  <Button onClick={handleSentMessage}>Send</Button>
+                  <Button onClick={handleClose} >Close</Button>
+              
                  
                 </ButtonGroup>
   </Dialog>
@@ -322,7 +276,7 @@ const handleRejectSchool=async(id)=>{
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Schools
+          List of Approved   Puplic Places
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
@@ -346,10 +300,26 @@ const handleRejectSchool=async(id)=>{
           placeholder="Search ..."
           variant="outlined"
         />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            '& > *': {
+              m: 1,
+            },
+          }}
+          >
+          
+          <ButtonGroup variant="text" aria-label="text button group">
+            
+            <Button onClick={generateListOfApprovedPublicPlace  }>Generate report</Button>
+          </ButtonGroup>
+          </Box>
 
   </Box>
         <Table aria-label="caption table">
-          <caption className="textTitle">School List</caption>
+          <caption className="textTitle">Public Place List</caption>
           {/* <Button
               variant="contained"
               sx={{ backgroundColor: "#F9842C" }}
@@ -362,12 +332,12 @@ const handleRejectSchool=async(id)=>{
           
           <TableHead>
             <TableRow>
-              <TableCell align="center">School Name</TableCell>
+              <TableCell align="center">Name</TableCell>
               <TableCell>Source</TableCell>
+              <TableCell align="center">Type</TableCell>
               <TableCell align="center">Distance</TableCell>
-              <TableCell align="center">Level</TableCell>
               <TableCell align="center">Status</TableCell>
-              <TableCell align="center">ACTION</TableCell>
+             
             </TableRow>
           </TableHead>
           <TableBody>
@@ -381,101 +351,54 @@ const handleRejectSchool=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-             
-            <React.Fragment>
-            <TableCell align="center">{details.name}</TableCell>
+              {
+                details.status=="Approved"?
+                <React.Fragment>
+                <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
                
+                <TableCell align="center">{details.type}</TableCell>
                 <TableCell align="center">{details.how_long}</TableCell>
-                <TableCell align="center">{details.level}</TableCell>
                 <TableCell align="center">{details.status}</TableCell>
                 <TableCell align="center">
 
-                <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  '& > *': {
-                    m: 1,
-                  },
-                }}
-                >
-                
-                <ButtonGroup variant="text" aria-label="text button group">
-                  <Button onClick={async()=>{
-                    handleAproveSchool(details.id)
-                   }}>Approve</Button>
-                  <Button onClick={()=>{
-                    handleRejectSchool(details.id)
-                  }}>Reject</Button>
-                  <Button onClick={()=>{
-                    handleFeedBack(details.id)
-                  }}>Feed Back</Button>
-                </ButtonGroup>
-                </Box>
+               
       
               
                 </TableCell>
-            </React.Fragment>
+                </React.Fragment>:null
+              }
                 
               </TableRow>
               ))}
               </React.Fragment>
             ):(
-              
               <React.Fragment>
-              {schoolsDetails.slice(0, limit).map((details) => (
+              {publicPlacesDetails.slice(0, limit).map((details) => (
               <TableRow
                 hover
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-              
-            
-         
+              {details.status=="Approved"?
             <React.Fragment>
-                <TableCell align="center">{details.name}</TableCell>
-                  <TableCell component="th" scope="row">
-                    {details.source}
-                  </TableCell>
-                 
-                  <TableCell align="center">{details.how_long}</TableCell>
-                  <TableCell align="center">{details.level}</TableCell>
-                  <TableCell align="center">{details.status}</TableCell>
-                  <TableCell align="center">
-  
-                  <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    '& > *': {
-                      m: 1,
-                    },
-                  }}
-                  >
-                  
-                  <ButtonGroup variant="text" aria-label="text button group">
-                    <Button onClick={async()=>{
-                      handleAproveSchool(details.id)
-                     }}>Approve</Button>
-                    <Button onClick={()=>{
-                      handleRejectSchool(details.id)
-                    }}>Reject</Button>
-                    <Button onClick={()=>{
-                      handleFeedBack(details.id)
-                    }}>Feed Back</Button>
-                  </ButtonGroup>
-                  </Box>
-        
-                
-                  </TableCell>
-              </React.Fragment>
-                  
-            
+            <TableCell align="center">{details.name}</TableCell>
+            <TableCell component="th" scope="row">
+              {details.source}
+            </TableCell>
+           
+            <TableCell align="center">{details.type}</TableCell>
+            <TableCell align="center">{details.how_long}</TableCell>
+            <TableCell align="center">{details.status}</TableCell>
+            <TableCell align="center">
+
+          
+            </TableCell>
+            </React.Fragment>:null
+          }
+               
               </TableRow>
               ))}
               </React.Fragment>
@@ -487,56 +410,7 @@ const handleRejectSchool=async(id)=>{
       </TableContainer>
       </Container>
     </Page>
-    <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>user information</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            please provide the school information. We
-            will send updates occasionally.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="FullNames"
-            label="Full Names"
-            type="text"
-            fullWidth
-            variant="standard"
-          />
-           <TextField
-            autoFocus
-            margin="dense"
-            id="email"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-            <TextField
-          id="outlined-select-currency-native"
-          select
-          label="Native select"
-          value={role}
-          fullWidth
-          variant="standard"
-          onChange={handleChange}
-          SelectProps={{
-            native: true,
-          }}
-          helperText="Please select the Role"
-        >
-          {roles.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
-        </DialogActions>
-      </Dialog>
+    
 
     </React.Fragment>
    

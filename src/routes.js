@@ -20,6 +20,7 @@ import HouseHolds from "./pages/HouseHolds";
 import HealthFacility from "./pages/HealthFacility";
 import ListApprovedHealthFacility from "./pages/ListApprovedHealthFacility";
 import ListRejectedHealthFacility from "./pages/ListRejectedHealthFacility";
+import ListApprovedPublicPlace from "./pages/ListApprovedPublicPlace";
 import Filter from './pages/Filter';
 // ----------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ export default function Router() {
         { path: 'products', element: <Products /> },
         { path: 'schoolsrejected', element: <ListRejectedSchools /> },
         { path: 'householdsrejected', element: <ListRejectedHouseHolds /> },
-        
+        { path: 'publicplaceapproved', element: <ListApprovedPublicPlace /> },
         { path: 'healthfacilitiesrejected', element: <ListRejectedHealthFacility /> },
         { path: 'healthfacilities',element: <HealthFacility />}, 
         { path: 'schoolsapproved', element: <ListApprovedSchools /> },

@@ -22,15 +22,28 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  Grid,
+  CardHeader, CardContent,
 } from '@mui/material';
-
-
+import { useTheme } from '@mui/material/styles';
+import {
+  AppTasks,
+  AppNewsUpdate,
+  AppOrderTimeline,
+  AppCurrentVisits,
+  AppWebsiteVisits,
+  AppTrafficBySite,
+  AppWidgetSummary,
+  AppCurrentSubject,
+  AppConversionRates,
+} from '../sections/@dashboard/app';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import MenuItem from '@mui/material/MenuItem';
 import axios from 'axios';
 // components
 import Page from '../components/Page';
@@ -46,6 +59,8 @@ import moment from "moment";
 import jsPdf from "jspdf";
 import autoTable from 'jspdf-autotable';
 import logo from "../components/images/logo.png";
+import 'chart.js/auto';
+import {Pie} from 'react-chartjs-2';
 // mock
 import USERLIST from '../_mock/user';
 
@@ -53,33 +68,9 @@ import { getUsersAction } from "../redux/actions/getUsersAction"
 import { getSchoolsAction } from '../redux/actions/schoolsAction';
 
 // ----------------------------------------------------------------------
-const roles=[{
-  value:"SuperAdmin",
-  label:"Super Admin"
-},
-{
-  value:"Admin",
-  label:"Admin"
-},
-{
-  value:"User",
-  label:"User"
-},
-{
-  value:"OrganistionLeader",
-  label:"Organistion Leader"
-},
-]
 
-const TABLE_HEAD = [
-  { id: 'name', label: 'Name', alignRight: false },
-  { id: 'source', label: 'Source', alignRight: false },
-  { id: 'howLong', label: 'Distance', alignRight: false },
-  { id: 'level', label: 'Level', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: 'Action', label: 'Action', alignRight: false },
-  { id: '' },
-];
+
+
 
 // ----------------------------------------------------------------------
 
@@ -93,28 +84,14 @@ function descendingComparator(a, b, orderBy) {
   return 0;
 }
 
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
 
-function applySortFilter(array, comparator, query) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
-  }
-  return stabilizedThis.map((el) => el[0]);
-}
 
 export default function School() {
   const [value, setValue] = React.useState('Controlled');
-
+  //chart
+  const [data, setData] = useState({ datasets: [] });
+  const theme = useTheme();
+  ////////////////////////////
   const handleChangeA = (event) => {
     setValue(event.target.value);
   };
@@ -142,6 +119,131 @@ export default function School() {
  const [search, setSearch] = useState(false);
  const [openFeedBack,setOpenFeedBack]=useState(false)
 
+/////filtering
+const [province,setProvince]=useState('')
+const [provinceName,setProvinceName]=useState('')
+const [provincesData,setProvincesData]=useState([]);
+
+const [districtsData,setDistrictsData]=useState([]); 
+const [district,setDistrict]=useState('')
+const [districtName,setDistrictName]=useState('')
+
+const [sectorsData,setSectorsData]=useState([]);
+const  [sector,setSector]=useState('')
+const [sectorName,setSectorName]=useState('');
+
+const [cellsData,setCellsData]=useState([]);
+const [cell,setCell]=useState('');
+const [cellName,setCellName]=useState('')
+
+const [ villagesData,setVillagesData]=useState([])
+const [village,setVillage]=useState('')
+const [villageName,setVillageName]=useState('')
+
+useEffect(()=>{
+  async function fetchProvinces(){
+await axios.get('http://localhost:8000/api/provinces').then((response)=>{
+  setProvincesData(response.data.data)
+  console.log("province ::",provincesData )
+}).catch((error)=>{
+  console.log(error)
+})}
+  
+  fetchProvinces()
+},[])
+
+console.log("province name::",provincesData ,provinceName,districtName,sectorName,cellName,villageName)
+const handleChange =async (event) => {
+  setProvince(event.target.value);
+  provincesData.map((p)=>{
+    if(p.id===event.target.value){
+      setProvinceName(p.Provinces)
+      
+    }
+  })
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/districts/${event.target.value}`).then((response)=>{
+          setDistrictsData(response.data.data)
+}).catch((error)=>{
+  console.log(error)
+})
+  }
+ 
+};
+
+
+const handleDistrictChange =async (event) => {
+  setDistrict(event.target.value);
+ 
+  districtsData.map((p)=>{
+    if(p.id===event.target.value){
+      setDistrictName(p.Districts) 
+     
+    }
+  });
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/sectors/${event.target.value}`).then((response)=>{
+          setSectorsData(response.data.data)
+          
+}).catch((error)=>{
+  console.log(error)
+})}
+
+
+};
+
+
+
+
+const handleSectorChange =async (event) => {
+  setSector(event.target.value);
+  sectorsData.map((p)=>{
+    if(p.id===event.target.value){
+      setSectorName(p.Sectors)   
+    }
+  });
+   if(event.target.value){
+       await axios.get(`http://localhost:8000/api/cells/${event.target.value}`).then((response)=>{
+           setCellsData(response.data.data)
+        
+}).catch((error)=>{
+   console.log(error)
+})}
+
+};
+
+
+const handleCellChange =async (event) => {
+  setCell(event.target.value);
+  cellsData.map((p)=>{
+    if(p.id===event.target.value){
+      setCellName(p.Cells)
+      
+    }
+  })
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/villages/${event.target.value}`).then((response)=>{
+          setVillagesData(response.data.data);  
+          setVillage(event.target.value);
+    
+}).catch((error)=>{
+  console.log(error)
+})}
+
+};
+
+const handleVillageChange =async (event) => {
+  setVillage(event.target.value);
+  villagesData.map((p)=>{
+    if(p.id===event.target.value){
+      setVillageName(p.villages)
+      
+    }
+  })
+
+};
+
+ ////////////////////////////////////////////////////////////
  const handleFeedBack=(id)=>{
   setOpenFeedBack(true)
  }
@@ -151,7 +253,7 @@ export default function School() {
    const doc = new jsPdf();
    doc.addImage(logo, "JPEG", 20, 5, 40, 40);
    doc.setFont("Helvertica", "normal");
-   doc.text("Water Management System", 20, 50);
+   doc.text("Water Monitoring System", 20, 50);
    doc.text(`MININFRA`, 20, 55);
    doc.text("Email: info@mininfra.gov.rw", 20, 60);
    doc.setFont("Helvertica", "normal");
@@ -168,9 +270,7 @@ export default function School() {
        school.dis_name,
        school.level,
        school.status,
-      
       // format(new Date(student.updated_at), "yyyy-MM-dd")
- 
      ];
       if(school.status==="Approved"){
      tableRows.push(schoolData);
@@ -197,27 +297,6 @@ export default function School() {
  doc.save(`report_${dateStr}.pdf`);
  };
  
-
-const handleAproveSchool=(id)=>{
-const url=`http://localhost:8000/api/schools/approve-school/${id}`
-axios.put(url, {})
-.then(function (response) {
-  console.log(response.data);
-})
-.catch(function (error) {
-  console.log(error);
-});
-}
-const handleRejectSchool=(id)=>{
-  const url=`http://localhost:8000/api/schools/reject-school/${id}`
-  axios.put(url, {})
-  .then(function (response) {
-    console.log(response.data);
-  })
-  .catch(function (error) {
-    console.log(error);
-  });
-  }
  useEffect(() => {
   async function fetchData() {
    // await dispatch(getUsersAction())
@@ -229,20 +308,174 @@ const handleRejectSchool=(id)=>{
     }
   }
   fetchData();
+  if(districtName){
+    fetchDistrictData()
+  }
+  if(sectorName){
+    fetchSectorData()
+  }
+  if(cellName){
+    fetchCellData()
+  }
 }, [getSchools.details]);
-  const handleChange = (event) => {
-    setRole(event.target.value);
-  };
+
+const [pieData, setPieData] = useState([]);
+
+  async function fetchDistrictData(){
+    const labelSet = [];
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let UnimprovedWaterSource = 0;
+    await axios
+      .post(
+        `http://localhost:8000/api/schools/schoolsbydistrictname`,
+        {
+          districtName:districtName.replaceAll(/\s/g, ''),
+        }
+      )
+      .then(function(response) {
+        
+        const res = response.data.data;
+        return res;
+      })
+      .then(function(res) {
+        console.log("ggg ",res)
+        for (const key in res) {
+          let source = res[key].source;
+          let distance=res[key].how_long
+          if (source=== "Packaged bottled water" || distance==="On premises ") {
+            SafelyManagedServices = SafelyManagedServices + 1;
+          } else if (source === "Rainwater" || distance==="Up to 500 m") {
+            BasicServices = BasicServices + 1;
+          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+            LimitedServices = LimitedServices + 1;
+          } else {
+            UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+          }
+        }
+        const data = [
+          { label: "Safely Managed Services", value: SafelyManagedServices},
+          { label: "Basic Services", value: BasicServices },
+          { label: "Limited Services", value: LimitedServices },
+          { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+        ];
+        setPieData(data);
+      })
+      .catch(function(error) {
+        console.log("error", error);
+      });
+  
+  }
+
+  const [sectorpieData, setSectorpieData] = useState([]);
+
+  async function fetchSectorData(){
+    const labelSet = [];
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let UnimprovedWaterSource = 0;
+    await axios
+      .post(
+        `http://localhost:8000/api/schools/schoolsbysectorname`,
+        {
+          sectorName:sectorName.replaceAll(/\s/g, ''),
+        }
+      )
+      .then(function(response) {
+        
+        const res = response.data.data;
+        return res;
+      })
+      .then(function(res) {
+        console.log("ggg ",res)
+        for (const key in res) {
+          let source = res[key].source;
+          let distance=res[key].how_long
+          if (source=== "Packaged bottled water" || distance==="On premises ") {
+            SafelyManagedServices = SafelyManagedServices + 1;
+          } else if (source === "Rainwater" || distance==="Up to 500 m") {
+            BasicServices = BasicServices + 1;
+          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+            LimitedServices = LimitedServices + 1;
+          } else {
+            UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+          }
+        }
+        const data = [
+          { label: "Safely Managed Services", value: SafelyManagedServices},
+          { label: "Basic Services", value: BasicServices },
+          { label: "Limited Services", value: LimitedServices },
+          { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+        ];
+        setSectorpieData(data);
+      })
+      .catch(function(error) {
+        console.log("error", error);
+      });
+  
+  }
+
+  const [cellpieData, setCellpieData] = useState([]);
+
+  async function fetchCellData(){
+    const labelSet = [];
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let UnimprovedWaterSource = 0;
+    await axios
+      .post(
+        `http://localhost:8000/api/schools/schoolsbycellname`,
+        {
+          cellName:cellName.replaceAll(/\s/g, ''),
+        }
+      )
+      .then(function(response) {
+        
+        const res = response.data.data;
+        return res;
+      })
+      .then(function(res) {
+        console.log("ggg ",res)
+        for (const key in res) {
+          let source = res[key].source;
+          let distance=res[key].how_long
+          if (source=== "Packaged bottled water" || distance==="On premises ") {
+            SafelyManagedServices = SafelyManagedServices + 1;
+          } else if (source === "Rainwater" || distance==="Up to 500 m") {
+            BasicServices = BasicServices + 1;
+          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+            LimitedServices = LimitedServices + 1;
+          } else {
+            UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+          }
+        }
+        const data = [
+          { label: "Safely Managed Services", value: SafelyManagedServices},
+          { label: "Basic Services", value: BasicServices },
+          { label: "Limited Services", value: LimitedServices },
+          { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+        ];
+        setCellpieData(data);
+      })
+      .catch(function(error) {
+        console.log("error", error);
+      });
+  
+  }
+
+
+  // const handleChange = (event) => {
+  //   setRole(event.target.value);
+  // };
 
 
   const handleClose = () => {
     setOpen(false);
     setOpenFeedBack(false)
   };
-
-
-
-  
 
   const trimString = (s) => {
     var l = 0,
@@ -287,11 +520,175 @@ const handleRejectSchool=(id)=>{
       console.log(error);
     }
   };
- 
-
 
   return (
     <React.Fragment>
+    <DialogTitle>Please select ...</DialogTitle>
+    <Box
+    component="form"
+    sx={{
+      '& .MuiTextField-root': { m: 1, width: '25ch' },
+    }}
+    noValidate
+    autoComplete="off"
+  >
+    
+    <div>
+      <TextField
+        id="standard-select-currency"
+        select
+        label=""
+        value={province}
+        name={province}
+        onChange={handleChange}
+        helperText="Please select your province"
+        variant="standard"
+      >
+        {provincesData.map((option) => (
+          <MenuItem key={option.id} value={option.id} name={option.Provinces} >
+            {option.Provinces}
+          </MenuItem>
+        ))}
+      </TextField>
+      
+        <TextField
+        id="standard-select-currency-native"
+        select
+        label=""
+        value={district}
+        name={district}
+        onChange={handleDistrictChange}
+        SelectProps={{
+          native: true,
+        }}
+        helperText="Please select your district"
+        variant="standard"
+      >
+        {districtsData.map((option) => (
+          <option key={option.id} value={option.id} name={option.Districts}>
+            {option.Districts}
+          </option>
+        ))}
+      </TextField>
+    
+      <TextField
+      id="standard-select-currency-native"
+      select
+      label=""
+      value={sector}
+      name={sector}
+      onChange={handleSectorChange}
+      SelectProps={{
+        native: true,
+      }}
+      helperText="Please select your sector"
+      variant="standard"
+    >
+      {sectorsData.map((option) => (
+        <option key={option.id} value={option.id} name={option.Sectors}>
+          {option.Sectors}
+        </option>
+      ))}
+    </TextField>
+    <TextField
+    id="standard-select-currency-native"
+    select
+    label=""
+    value={cell}
+    name={cell}
+    onChange={handleCellChange}
+    SelectProps={{
+      native: true,
+    }}
+    helperText="Please select your cell"
+    variant="standard"
+  >
+    {cellsData.map((option) => (
+      <option key={option.id} value={option.id} name={option.Cells}>
+        {option.Cells}
+      </option>
+    ))}
+  </TextField>
+    </div>
+  </Box>
+  <Box
+    component="form"
+    sx={{
+      '& .MuiTextField-root': { m: 1, width: '25ch',height:'25ch' },
+    }}
+    noValidate
+    autoComplete="off"
+  >
+  <Grid item xs={12} md={6} lg={4}>
+          <Card >
+          <CardHeader title="Schools Information Analytics" subheader="Distric/sector/cell" />
+          <CardContent>
+            <Box
+              sx={{
+                display: 'grid',
+                gap: 2,
+                gridTemplateColumns: 'repeat(2, 1fr)',
+              }}
+            >
+{
+  districtName?
+  <Grid item xs={12} md={6} lg={4}>
+  <AppCurrentVisits
+    title="District Analytics"
+    chartData={pieData}
+    chartColors={[
+      theme.palette.primary.main,
+      theme.palette.chart.blue[0],
+      theme.palette.chart.violet[0],
+      theme.palette.chart.yellow[0],
+    ]}
+  />
+</Grid>
+  :null
+}
+ 
+
+           {
+            sectorName?
+            <Grid item xs={12} md={6} lg={4}>
+            <AppCurrentVisits
+              title="Sector Analytics"
+              chartData={sectorpieData}
+              chartColors={[
+                theme.palette.primary.main,
+                theme.palette.chart.blue[0],
+                theme.palette.chart.violet[0],
+                theme.palette.chart.yellow[0],
+              ]}
+            />
+          </Grid>
+            :null
+           }
+         {
+          cellName?
+          <Grid item xs={12} md={6} lg={4}>
+          <AppCurrentVisits
+            title="Cell Analytics"
+            chartData={cellpieData}
+            chartColors={[
+              theme.palette.primary.main,
+              theme.palette.chart.blue[0],
+              theme.palette.chart.violet[0],
+              theme.palette.chart.yellow[0],
+            ]}
+          />
+        </Grid>
+          :null
+         }
+        
+
+            </Box>
+            </CardContent>
+
+          </Card>
+          </Grid>
+ 
+  </Box>
     <Dialog onClose={handleClose} open={openFeedBack}>
     <DialogTitle>Provide feedbak</DialogTitle>
     <Box

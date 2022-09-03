@@ -35,6 +35,7 @@ const navConfigAdmin = [
     path: '/dashboard/healthfacilities',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
+
   {
     title: 'Organizations',
     path: '/dashboard/organizations',

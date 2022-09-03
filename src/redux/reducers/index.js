@@ -18,6 +18,7 @@ import healthfacilitiesReducer from "./healthfacilityReducer";
 
 import addHealthFacilityReducer from "./addHealthFacilityReducer";
 import addPublicPlaceReducer from "./addPublicPlaceReducer";
+import publicPlacesReducer from "./publicPlacesReducer"
 
 const allReducers = combineReducers({
     userLogin:loginReducer,
@@ -38,6 +39,7 @@ const allReducers = combineReducers({
     getHealthfacilities: healthfacilitiesReducer,
     addHealthFacility: addHealthFacilityReducer,
     addPublicPlace:addPublicPlaceReducer,
+    getPublicPlaces:publicPlacesReducer
 });
 
 export default allReducers;

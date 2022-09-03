@@ -43,6 +43,8 @@ var _addHealthFacilityReducer = _interopRequireDefault(require("./addHealthFacil
 
 var _addPublicPlaceReducer = _interopRequireDefault(require("./addPublicPlaceReducer"));
 
+var _publicPlacesReducer = _interopRequireDefault(require("./publicPlacesReducer"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 var allReducers = (0, _redux.combineReducers)({
@@ -63,7 +65,8 @@ var allReducers = (0, _redux.combineReducers)({
   getHouseHolds: _houseHoldReducer["default"],
   getHealthfacilities: _healthfacilityReducer["default"],
   addHealthFacility: _addHealthFacilityReducer["default"],
-  addPublicPlace: _addPublicPlaceReducer["default"]
+  addPublicPlace: _addPublicPlaceReducer["default"],
+  getPublicPlaces: _publicPlacesReducer["default"]
 });
 var _default = allReducers;
 exports["default"] = _default;

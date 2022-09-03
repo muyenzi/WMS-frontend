@@ -34,7 +34,11 @@ const navConfig = [
     path: '/dashboard/healthfacilitiesapproved',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
- 
+  {
+    title: 'Public Places',
+    path: '/dashboard/publicplaceapproved',
+    icon: getIcon('eva:pie-chart-2-fill'),
+  },
   {
     title: 'data collection',
     path: '/dashboard/user',
