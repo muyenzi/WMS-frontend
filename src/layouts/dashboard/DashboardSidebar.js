@@ -120,17 +120,17 @@ export default function DashboardSidebar({ isOpenSidebar, onCloseSidebar }) {
         </Link>
       </Box>
     {/* condition */}
-   {role=="Admin"?
+   {role=="DataController"?
    <NavSection navConfig={navConfigAdmin} /> :null
   
   }
   {
-    role=="SuperAdmin"?
+    role=="Admin"?
     <NavSection navConfig={navConfig} />:null
   }
 
   {
-    role=="User"?
+    role=="DataCollector"?
     <NavSection navConfig={navConfigUser} />:null
   }
       

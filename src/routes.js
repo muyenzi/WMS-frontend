@@ -8,7 +8,7 @@ import User from './pages/User';
 import Login from './pages/Login';
 import NotFound from './pages/Page404';
 import Register from './pages/Register';
-import Products from './pages/Products';
+
 import DashboardApp from './pages/DashboardApp';
 import School from './pages/School';
 import Organization from './pages/Organization';
@@ -21,7 +21,10 @@ import HealthFacility from "./pages/HealthFacility";
 import ListApprovedHealthFacility from "./pages/ListApprovedHealthFacility";
 import ListRejectedHealthFacility from "./pages/ListRejectedHealthFacility";
 import ListApprovedPublicPlace from "./pages/ListApprovedPublicPlace";
+import ListRejectedPublicPlace from "./pages/ListRejectedPublicPlace";
+import Publicplaces from "./pages/Publicplaces";
 import Filter from './pages/Filter';
+import Raissa from './pages/Raissa';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -34,16 +37,18 @@ export default function Router() {
         { path: 'user', element: <User /> },
         { path: 'schools', element: <School /> },
         { path: 'households', element: <HouseHolds /> },
+        { path: 'publicplaces', element: <Publicplaces /> },
         { path: 'householdsapproved', element: <ListApprovedHouseHold /> },
         { path: 'healthfacilitiesapproved', element: <ListApprovedHealthFacility /> },
         { path: 'organizations', element: <Organization /> },
-        { path: 'products', element: <Products /> },
         { path: 'schoolsrejected', element: <ListRejectedSchools /> },
         { path: 'householdsrejected', element: <ListRejectedHouseHolds /> },
         { path: 'publicplaceapproved', element: <ListApprovedPublicPlace /> },
+        { path: 'publicplacerejected', element: <ListRejectedPublicPlace /> },
         { path: 'healthfacilitiesrejected', element: <ListRejectedHealthFacility /> },
         { path: 'healthfacilities',element: <HealthFacility />}, 
         { path: 'schoolsapproved', element: <ListApprovedSchools /> },
+        {path:'raissa',element:<Raissa/>},
         { path: 'blog', element: <Blog /> },
       ],
     },

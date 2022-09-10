@@ -48,22 +48,27 @@ import CloseIcon from '@mui/icons-material/Close';
 import {  IconButton} from '@mui/material';
 // ----------------------------------------------------------------------
 const roles=[{
-  value:"SuperAdmin",
-  label:"Super Admin"
-},
-{
   value:"Admin",
   label:"Admin"
 },
 {
-  value:"User",
-  label:"User"
+  value:"DataAnalyst",
+  label:"Data Analyst"
 },
 {
-  value:"OrganistionLeader",
-  label:"Organistion Leader"
+  value:"DataCollector",
+  label:"Data Collector"
+},
+{
+  // value:"OrganistionAnalyst",
+  // label:"Organistion Analyst"
 },
 ]
+// {
+//   value:"OrganistionLeader",
+//   label:"Organistion Leader"
+// },
+
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
@@ -282,7 +287,7 @@ setRole('User')
                     </TableCell>
 
                     <TableCell align="right">
-                      <UserMoreMenu />
+                   
                     </TableCell>
                       </TableRow>
                     );
@@ -323,7 +328,7 @@ setRole('User')
         <DialogTitle>user information</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            please provide user unformation. We
+            please provide user information. We
             will send updates occasionally.
           </DialogContentText>
           {

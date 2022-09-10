@@ -40,11 +40,11 @@ var addSchoolAction = function addSchoolAction(details, navigate) {
               frequency: schoolFrequency,
               how_long: schoolHowLong,
               level: schoolLevel,
-              prov_name: provinceName,
-              dis_name: districtName,
-              sec_name: sectorName,
-              cell_name: cellName,
-              vil_name: villageName
+              prov_name: provinceName.replaceAll(/\s/g, ''),
+              dis_name: districtName.replaceAll(/\s/g, ''),
+              sec_name: sectorName.replaceAll(/\s/g, ''),
+              cell_name: cellName.replaceAll(/\s/g, ''),
+              vil_name: villageName.replaceAll(/\s/g, '')
             }));
 
           case 15:

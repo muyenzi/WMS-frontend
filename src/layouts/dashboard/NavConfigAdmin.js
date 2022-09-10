@@ -14,11 +14,15 @@ const navConfigAdmin = [
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   
-  {
-    title: 'users',
-    path: '/dashboard/user',
-    icon: getIcon('eva:people-fill'),
-  },
+  // {
+  //   title: 'users',
+  //   path: '/dashboard/user',
+  //   icon: getIcon('eva:people-fill'),
+  // },
+  // {
+  //   title:"raisa",
+  //   path:"/dashboard/raissa"
+  // },
   {
     title: 'Schools',
     path: '/dashboard/schools',
@@ -37,8 +41,8 @@ const navConfigAdmin = [
   },
 
   {
-    title: 'Organizations',
-    path: '/dashboard/organizations',
+    title: 'Public Places',
+    path: '/dashboard/publicplaces',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {

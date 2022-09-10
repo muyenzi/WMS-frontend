@@ -7,7 +7,6 @@ import { Box, Card, Paper, Typography,Container, Grid,CardHeader, CardContent, B
 // components
 import Page from '../components/Page';
 import Iconify from '../components/Iconify';
-
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -149,27 +148,27 @@ const schoolsLevels =[
   label:"Secondary",
 },
 {
-  values:"Combined pre-primary & primary ",
+  values:"Combined pre-primary & primary",
   label:"Combined pre-primary & primary",
 },
 {
   values:"Combined primary & secondary",
-  label:"Combined pre-primary, primary & secondary.",
+  label:"Combined pre-primary, primary & secondary",
 },
 ]
 
 const schoolsHowLong=[
   {
-  value:"On premises ",
+  value:"On premises",
   label:"On premises",
 },
 {
-  value:" Up to 500 m ",
-  label:" Up to 500 m ",
+  value:"Up to 500 m",
+  label:"Up to 500 m",
 },
 {
-  value:"  500 m or further Note: On premises means within the building or facility grounds.",
-  label:"  500 m or further Note: On premises means within the building or facility grounds. ",
+  value:"500 m or further Note: On premises means within the building or facility grounds",
+  label:"500 m or further Note: On premises means within the building or facility grounds",
 },
 
 
@@ -190,12 +189,12 @@ const schoolsFrequencies=[
 
 const schoolsSources =[
   {
-  values:"Piped water supply inside the school building ",
-  label:"Piped water supply inside the school building ",
+  values:"Piped water supply inside the school building",
+  label:"Piped water supply inside the school building",
 },
 {
-  values:"Piped water supply outside the school building  ",
-  label:"Piped water supply outside the school building  ",
+  values:"Piped water supply outside the school building",
+  label:"Piped water supply outside the school building",
 },
 {
   values:"Protected well/spring",
@@ -206,24 +205,24 @@ const schoolsSources =[
   label:"Rainwater",
 },
 {
-  values:"Unprotected well/spring ",
-  label:"Unprotected well/spring ",
+  values:"Unprotected well/spring",
+  label:"Unprotected well/spring",
 },
 {
-  values:"Packaged bottled water ",
-  label:"Packaged bottled water ",
+  values:"Packaged bottled water",
+  label:"Packaged bottled water",
 },
 {
-  values:"Tanker-truck or cart ",
-  label:"Tanker-truck or cart ",
+  values:"Tanker-truck or cart",
+  label:"Tanker-truck or cart",
 },
 {
-  values:"Surface water (lake, river, stream)  ",
-  label:"Surface water (lake, river, stream) ",
+  values:"Surface water (lake, river, stream)",
+  label:"Surface water (lake, river, stream)",
 },
 {
-  values:"No water source ",
-  label:"No water source ",
+  values:"No water source",
+  label:"No water source",
 },
 ]
 
@@ -475,12 +474,16 @@ const handleVillageChange =async (event) => {
   }
   const handleSaveHouseHold=async()=>{
   await dispatch(addHouseHoldAction({provinceName,districtName,sectorName,cellName,villageName  ,householdPhone,householdSource,householdFrequency,householdHowLong}))
+  setSchoolName('')
+  setSchoolHowLong('')
+  setSchoolFrequency('')
+  setSchoolLevel('')
+  setSchoolSource('')
+ setOpentSchool(false)
   if(addHouseHold.error){
     setOpen(true)
   }
-  if(addHouseHold.details){
-    setOpenSuccess(true)
-  }
+ 
 
 }
   
@@ -491,9 +494,7 @@ const handleVillageChange =async (event) => {
   if(addSchool.error){
     setOpen(true)
   }
-  if(addSchool.schools){
-    setOpenSuccess(true)
-  }
+  
 
 }
 const handleSavePublicPlace=async()=>{
@@ -568,12 +569,14 @@ const handleSavePublicPlace=async()=>{
     getData();
     getDataHouseHold();
     getDataHealthFacilities()
+    getDataPublicPlaces();
   },[]);
 
 
   const [pieData, setPieData] = useState([]);
   const [lineData, setLineData] = useState([]);
   const [radarData, setRadarData] = useState([]);
+  const [publicPlacepieData,setPublicPlacepieData]=useState([])
 
 
   const getDataHealthFacilities = async () => {
@@ -616,8 +619,47 @@ const handleSavePublicPlace=async()=>{
     }
   };
 
+  const getDataPublicPlaces = async () => {
+    let SafelyManagedServices = 0;
+    let BasicServices = 0;
+    let LimitedServices = 0;
+    let SurfaceWaterSource = 0;
+    const url='http://localhost:8000/api/publicplaces'
+    try {
+      const responce = await axios.get(url);
+      console.log("public palce",responce)
+      for (const key in responce.data.data) {
+        let source = responce.data.data[key].source;
+        let distance=responce.data.data[key].how_long
+        let provName=responce.data.data[key].prov_name
+        
+        if (source=== "an improved source" ) {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "an improved source" && distance==="less than 30 minutes round trip" ) {
+          BasicServices =  BasicServices + 1;
+        } else if (source === "an improved source" && distance==="more than 30 minutes round trip" ) {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          SurfaceWaterSource = SurfaceWaterSource  + 1;
+        }
+      }
+    
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Surface Water", value: SurfaceWaterSource },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Basic Services ", value: BasicServices},
+      ];
+    
+      console.log("daooo",data)
+       setPublicPlacepieData(data);
+    // setPieData(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const getDataHouseHold = async () => {
+  const getDataHouseHold =async () => {
    
     let SafelyManagedServices = 0;
     let BasicServices = 0;
@@ -646,18 +688,12 @@ const handleSavePublicPlace=async()=>{
         { label: "Safely Managed Services", value: SafelyManagedServices},
         { label: "Surface Water", value: SurfaceWaterSource },
         { label: "Limited Services", value: LimitedServices },
-        { label: "Basic Services ", value: 2},
+        { label: "Basic Services ", value: BasicServices},
       ];
     
      
-      // const lineData = [
-      //   { name: "unfinished", "Active User": unfinished },
-      //   { name: "approved", "Active User": approved },
-      //   { name: "rejected", "Active User": rejected },
-      // ];
       console.log("daooo",data)
        setLineData(data);
-    // setPieData(data);
     } catch (error) {
       console.log(error);
     }
@@ -721,6 +757,29 @@ const handleSavePublicPlace=async()=>{
 
 
   const handleClose = () => {
+    setProvinceName('')
+    setDistrictName('')
+    setProvinceName('')
+    setCellName('')
+    setVillageName('')
+
+    setHealthfacilityName("")
+    setHealthfacilityHowLong('');
+    setHealthfacilitySource('')
+    setHealthfacilityType('')
+
+
+    setHouseholdFrequency('')
+    setHouseholdHowLong('')
+    setHouseholdPhone('')
+    setHouseholdSource('')
+
+    setSchoolName('')
+    setSchoolHowLong('')
+    setSchoolFrequency('')
+    setSchoolLevel('')
+    setSchoolSource('')
+
     setOpentSchool(false);
     setOpenHouseHold(false);
     setOpenHealthFacility(false)
@@ -735,7 +794,7 @@ const handleSavePublicPlace=async()=>{
     <DialogTitle>HealthFacility information</DialogTitle>
     <DialogContent>
       <DialogContentText>
-        please provide HealthFacility unformation. We
+        please provide HealthFacility information. We
         will send updates occasionally.
       </DialogContentText>
       {
@@ -973,7 +1032,7 @@ native: true,
 
 >
 {healthFacilityHowLongs.map((option) => (
-<option key={option.value} value={option.value}>
+<option key={option.values} value={option.values}>
   {option.label}
 </option>
 ))}
@@ -991,7 +1050,7 @@ native: true,
         <DialogTitle>School information</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            please provide School unformation. We
+            please provide School information. We
             will send updates occasionally.
           </DialogContentText>
           {
@@ -1026,7 +1085,6 @@ native: true,
                   color="inherit"
                   size="small"
                   onClick={handleClose}
-                
                 >
                   <CloseIcon fontSize="inherit" />
                 </IconButton>
@@ -1161,7 +1219,7 @@ native: true,
     </Box>
    
           <Typography variant="h6" gutterBottom>
-            1. Is drinking water from the main source currently available at the school?
+            1. What is the main source of drinking water provided by the school? (Select one - most frequently used)
            </Typography>
             <TextField
           id="outlined-select-currency-native"
@@ -1186,7 +1244,7 @@ native: true,
         </TextField>
 
         <Typography variant="h6" gutterBottom>
-        2.	What is the main source of drinking water provided by the school? (Select one - most frequently used):
+        2. Is drinking water from the main source currently available at the school?	:
        </Typography>
         <TextField
       id="outlined-select-currency-native"
@@ -1235,7 +1293,7 @@ native: true,
 </TextField>
 <Typography variant="h6" gutterBottom>
 
-4. What is the type of the school? (select on that applies): 
+4. What is the category of the school? (select on that applies): 
    </Typography>
     <TextField
   id="outlined-select-currency-native"
@@ -1253,7 +1311,7 @@ native: true,
  
 >
   {schoolsLevels.map((option) => (
-    <option key={option.value} value={option.value}>
+    <option key={option.values} value={option.values}>
       {option.label}
     </option>
   ))}
@@ -1271,7 +1329,7 @@ native: true,
       <DialogTitle>HouseHold information</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          please provide Household unformation. We
+          please provide Household information. We
           will send updates occasionally.
         </DialogContentText>
         {
@@ -1527,7 +1585,7 @@ SelectProps={{
       <DialogTitle>Public Place information</DialogTitle>
       <DialogContent>
         <DialogContentText>
-          please provide Public Place unformation. We
+          please provide Public Place information. We
           will send updates occasionally.
         </DialogContentText>
         {
@@ -1552,27 +1610,7 @@ SelectProps={{
            </Alert>
          </Collapse>
         }    
-        {
-          addPublicPlace.details? <Collapse in={openSuccess}>
-          <Alert
-          severity="success"
-            action={
-              <IconButton
-                aria-label="close"
-                color="inherit"
-                size="small"
-                onClick={handleClose}
-              
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-            }
-            sx={{ mb: 0.2 }}
-          >
-           {addPublicPlace.details}
-          </Alert>
-        </Collapse>:null
-        }
+      
        
         <TextField
           autoFocus
@@ -1696,7 +1734,7 @@ SelectProps={{
     </Box>
    
         <Typography variant="h6" gutterBottom>
-          	1. What is the type of the public place? (select one that applies):
+          	1. What is the category of the public place? (select one that applies):
             
          </Typography>
           <TextField
@@ -1793,10 +1831,10 @@ SelectProps={{
           Water Monitoring System Dashboard
         </Typography>
         {
-          role==="User"? 
+          role==="DataCollector"? 
           <Grid item xs={12} md={6} lg={4}>
           <Card >
-        <CardHeader title="Informations" subheader="Selecct service" />
+        <CardHeader title="Informations" subheader="Select service" />
         <CardContent>
           <Box
             sx={{
@@ -1854,7 +1892,7 @@ SelectProps={{
 
         <Grid container spacing={3}>
         {
-          role==="SuperAdmin" || role=="Admin" ?
+          role==="Admin" || role=="DataController" ?
           <React.Fragment>
           <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary title="HouseHolds" total={totalNumberOfHouseHold}  />
@@ -1864,7 +1902,7 @@ SelectProps={{
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <AppWidgetSummary title="Pabluci Place" total={totalNumberofPublicPlace} color="warning" />
+          <AppWidgetSummary title="Public Place" total={totalNumberofPublicPlace} color="warning" />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
@@ -1877,18 +1915,23 @@ SelectProps={{
         }
        
         {
-          role==="SuperAdmin"?
+          role==="Admin"?
           <React.Fragment>
-          <Grid item xs={12} md={6} lg={8}>
-          <AppConversionRates
-            title="House Holds"
-            subheader=""
-            chartData={lineData}
-          />
-        </Grid>
          
+        <Grid item xs={12} md={6} lg={6}>
+        <AppCurrentVisits
+          title="House Holds"
+          chartData={lineData}
+          chartColors={[
+            theme.palette.primary.main,
+            theme.palette.chart.blue[0],
+            theme.palette.chart.violet[0],
+            theme.palette.chart.yellow[0],
+          ]}
+        />
+      </Grid>
 
-        <Grid item xs={12} md={6} lg={4}>
+        <Grid item xs={12} md={6} lg={6}>
           <AppCurrentVisits
             title="Schools"
             chartData={pieData}
@@ -1900,44 +1943,21 @@ SelectProps={{
             ]}
           />
         </Grid>
+        <Grid item xs={12} md={6} lg={6} >
+        <AppCurrentVisits
+          title="Public Places"
+          chartData={publicPlacepieData}
+          chartColors={[
+            theme.palette.primary.main,
+            theme.palette.chart.blue[0],
+            theme.palette.chart.violet[0],
+            theme.palette.chart.yellow[0],
+          ]}
+        />
+      </Grid>
 
-        <Grid item xs={12} md={6} lg={8}>
-          <AppWebsiteVisits
-            title="Public Places"
-            subheader=""
-            
-              chartLabels={[8,8,9]}
-           
-           
-            chartData={[
-              {
-                name: 'Kigali ',
-                type: 'column',
-                fill: 'solid',
-                data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-              },
-              {
-                name: 'Westen',
-                type: 'area',
-                fill: 'gradient',
-                data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-              },
-              {
-                name: 'Easten',
-                type: 'line',
-                fill: 'solid',
-                data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-              },
-              {
-                name: 'North',
-                type: 'line',
-                fill: 'solid',
-                data: [10, 230, 36, 25, 35, 35, 64, 52, 59, 36, 39],
-              },
-            ]}
-          />
-        </Grid>
-        <Grid item xs={12} md={6} lg={4}>
+       
+        <Grid item xs={12} md={6} lg={6}>
         <AppCurrentVisits
           title="Health Facilities"
           chartData={radarData}

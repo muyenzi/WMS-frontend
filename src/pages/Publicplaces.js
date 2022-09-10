@@ -47,23 +47,24 @@ import USERLIST from '../_mock/user';
 
 import { getUsersAction } from "../redux/actions/getUsersAction"
 import { getSchoolsAction } from '../redux/actions/schoolsAction';
-import { getHealthfacilitiesAction } from '../redux/actions/healthfacilitiesAction';
+import { getPublicPlacesAction } from '../redux/actions/publicPlaceAction';
+
 // ----------------------------------------------------------------------
 const roles=[{
-  value:"SuperAdmin",
-  label:"Super Admin"
-},
-{
   value:"Admin",
   label:"Admin"
 },
 {
-  value:"User",
-  label:"User"
+  value:"DataAnalyst",
+  label:"Data Analyst"
 },
 {
-  value:"OrganistionLeader",
-  label:"Organistion Leader"
+  value:"DataCollector",
+  label:"Data Collector"
+},
+{
+  value:"OrganistionAnalyst",
+  label:"Organistion Analyst"
 },
 ]
 
@@ -114,25 +115,13 @@ export default function School() {
   const handleChangeA = (event) => {
     setValue(event.target.value);
   };
-  const [page, setPage] = useState(0);
-
-  const [order, setOrder] = useState('asc');
-
-  const [selected, setSelected] = useState([]);
-
-  const [orderBy, setOrderBy] = useState('name');
-
-  const [filterName, setFilterName] = useState('');
-
-  const [rowsPerPage, setRowsPerPage] = useState(5);const [open, setOpen] = React.useState(false);
+ 
   const [role, setRole] = React.useState('User');
-  const [usersDetails,setUsersDetails]=useState('')
-  const [schoolsDetails,setSchoolsDetails]=useState([])
+ 
  const dispatch=useDispatch();
  const getAllUsers=useSelector((state)=>state.getUsers);
  const getSchools=useSelector((state)=>state.getSchools);
- const getHealthfacilities=useSelector((state)=>state.getHealthfacilities)
-
+ const getPublicPlaces=useSelector((state)=>state.getPublicPlaces)
  const [limit, setLimit] = useState(5);
  const [selectedExamIds, setSelectedExamIds] = useState([]);
  const [results, setResults] = useState({});
@@ -140,22 +129,58 @@ export default function School() {
  const [openFeedBack,setOpenFeedBack]=useState(false)
 const [schoolId,setSchoolId]=useState('')
 
-
-const {healthfacilitiesData,setHealthfacilitiesData}=useState('')
+const [schoolsDetails,setSchoolsDetails]=useState([])
+const [ publicPlacesDetails, setPuplicPlacesDetails]=useState([])
 const [errorMessage,setErrorMessage]=useState('')
- const [textMessage,setTextMessage]=useState('');
- const [healthFacilityId,setHealthFacilityId]=useState('')
-
+const [textMessage,setTextMessage]=useState('');
  const handleFeedBack=(id)=>{
-  setHealthFacilityId(id)
-    setOpenFeedBack(true)
-   }
+  setSchoolId(id)
+  setOpenFeedBack(true)
+ }
 
-   const handleSentMessage=async(id)=>{
+ useEffect(() => {
+    async function fetchData() {
+     // await dispatch(getUsersAction())
+     // await dispatch(getHouseholdsAction())
+      await dispatch(getPublicPlacesAction())
+      if (!getPublicPlaces.loading) {
+        if (getPublicPlaces.details) {
+          setPuplicPlacesDetails(getPublicPlaces.details)
+        }
+      }
+    }
+    fetchData();
+  }, [getPublicPlaces.details]);
+
+
+const handleAproveSchool=async(id)=>{
+const url=`http://localhost:8000/api/schools/approve-school/${id}`
+await axios.put(url, {})
+.then(async function (response) {
+  console.log(response.data);
+  await dispatch(getALLSchools())
+})
+.catch(function (error) {
+  console.log(error);
+});
+}
+const handleRejectSchool=async(id)=>{
+  const url=`http://localhost:8000/api/schools/reject-school/${id}`
+ await axios.put(url, {})
+  .then(async function (response) {
+    console.log(response.data);
+    await dispatch(getALLSchools())
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  }
+  
+  const handleSentMessage=async(id)=>{
     const url=`http://localhost:8000/api/messages`
     await axios.post(url, {
       message:textMessage,
-      ref_id:healthFacilityId
+      ref_id:schoolId
     })
      .then(function (response) {
        console.log(response.data);
@@ -168,62 +193,44 @@ const [errorMessage,setErrorMessage]=useState('')
        console.log(error.response.data.message);
      });
   }
-  
-const handleAproveHealthFacility=async(id)=>{
-    const url=`http://localhost:8000/api/healthfacilities/approvehealthfacility/${id}`
-    await axios.put(url, {})
-    .then(async function (response) {
-      console.log(response.data);
-      await dispatch(getHealthfacilitiesAction())
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-    }
-
-    const handleRejectHealthfacility=async(id)=>{
-        const url=`http://localhost:8000/api/healthfacilities/rejecthealthfacility/${id}`
-       await axios.put(url, {})
-        .then(async function (response) {
-          console.log(response.data);
-          await dispatch(getHealthfacilitiesAction())
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-        }
+  const getALLSchools=async()=>{
+    const url=`http://localhost:8000/api/schools/`
+    await axios.get(url)
+     .then(function (response) {
+       console.log("hello schools",response.data.data);
+       setSchoolsDetails(response.data.data)
+       
+     
+     })
+     .catch(function (error) {
     
+       console.log(error.response.data.message);
+     });
+  }
 
-  
-  console.log(',,,,',getHealthfacilities.details)
  useEffect(() => {
+  getALLSchools();
   async function fetchData() {
    // await dispatch(getUsersAction())
-    await dispatch(getHealthfacilitiesAction())
-    if (!getHealthfacilities.loading) {
-      if (getHealthfacilities.details) {
-        setHealthfacilitiesData(getHealthfacilities.details)
-      }
-    }
+    // await dispatch(getSchoolsAction())
+    // if (!getSchools.loading) {
+    //   if (getSchools.details) {
+    //     setSchoolsDetails(getSchools.details)
+    //   }
+    // }
   }
   fetchData();
-}, [!getHealthfacilities.details]);
+}, []);
   const handleChange = (event) => {
     setRole(event.target.value);
   };
-  console.log("res[pponse data",healthfacilitiesData)
- 
 
   const handleClose = () => {
-    setOpen(false);
+    // setOpen(false);
     setOpenFeedBack(false)
     setErrorMessage('')
     setTextMessage('')
   };
-
-
-
-  
 
   const trimString = (s) => {
     var l = 0,
@@ -250,15 +257,15 @@ const handleAproveHealthFacility=async(id)=>{
     try {
       var results = [];
       const toSearch = trimString(searchKey); // trim it
-      for (var i = 0; i < getHealthfacilities.details.length; i++) {
-        for (var key in getHealthfacilities.details[i]) {
-          if (getHealthfacilities.details[i][key] != null) {
+      for (var i = 0; i < schoolsDetails.length; i++) {
+        for (var key in schoolsDetails[i]) {
+          if (schoolsDetails[i][key] != null) {
             if (
-              getHealthfacilities.details[i][key].toString().toLowerCase().indexOf(toSearch) !=
+              schoolsDetails[i][key].toString().toLowerCase().indexOf(toSearch) !=
               -1
             ) {
-              if (!itemExists(results, getHealthfacilities.details[i]))
-                results.push(getHealthfacilities.details[i]);
+              if (!itemExists(results, schoolsDetails[i]))
+                results.push(schoolsDetails[i]);
             }
           }
         }
@@ -315,7 +322,7 @@ const handleAproveHealthFacility=async(id)=>{
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Health Facilities
+            Public Places
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User
@@ -342,7 +349,7 @@ const handleAproveHealthFacility=async(id)=>{
 
   </Box>
         <Table aria-label="caption table">
-          <caption className="textTitle">School List</caption>
+          <caption className="textTitle">Public Places List</caption>
           {/* <Button
               variant="contained"
               sx={{ backgroundColor: "#F9842C" }}
@@ -355,7 +362,7 @@ const handleAproveHealthFacility=async(id)=>{
           
           <TableHead>
             <TableRow>
-              <TableCell align="center">Name</TableCell>
+              <TableCell align="center">Public Name</TableCell>
               <TableCell>Source</TableCell>
               <TableCell align="center">Distance</TableCell>
               <TableCell align="center">Type</TableCell>
@@ -374,7 +381,7 @@ const handleAproveHealthFacility=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-            {
+             {
               details.status=="Pending"?
               <React.Fragment>
               <TableCell align="center">{details.name}</TableCell>
@@ -400,38 +407,42 @@ const handleAproveHealthFacility=async(id)=>{
                   
                   <ButtonGroup variant="text" aria-label="text button group">
                     <Button onClick={async()=>{
-                      handleAproveHealthFacility(details.id)
+                      handleAproveSchool(details.id)
                      }}>Approve</Button>
                     <Button onClick={()=>{
-                      handleRejectHealthfacility(details.id)
+                      handleRejectSchool(details.id)
                     }}>Reject</Button>
                     <Button onClick={()=>{
                       handleFeedBack(details.id)
-                    }}>Feed Back</Button>
+                    }}>FeedBack</Button>
                   </ButtonGroup>
                   </Box>
+        
+                
                   </TableCell>
-              </React.Fragment> 
+              </React.Fragment>
               :null
-            }
+             }
            
+                
               </TableRow>
               ))}
               </React.Fragment>
             ):(
+              
               <React.Fragment>
-              {
-                       
-                getHealthfacilities.details.slice(0, limit).map((details) => (
+              {schoolsDetails.slice(0, limit).map((details) => (
               <TableRow
                 hover
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
+              
             {
+
               details.status=="Pending"?
               <React.Fragment>
-              <TableCell align="center">{details.name}</TableCell>
+                <TableCell align="center">{details.name}</TableCell>
                   <TableCell component="th" scope="row">
                     {details.source}
                   </TableCell>
@@ -454,10 +465,10 @@ const handleAproveHealthFacility=async(id)=>{
                   
                   <ButtonGroup variant="text" aria-label="text button group">
                     <Button onClick={async()=>{
-                      handleAproveHealthFacility(details.id)
+                      handleAproveSchool(details.id)
                      }}>Approve</Button>
                     <Button onClick={()=>{
-                      handleRejectHealthfacility(details.id)
+                      handleRejectSchool(details.id)
                     }}>Reject</Button>
                     <Button onClick={()=>{
                       handleFeedBack(details.id)
@@ -468,10 +479,12 @@ const handleAproveHealthFacility=async(id)=>{
                 
                   </TableCell>
               </React.Fragment>
+                  
               :null
             }
-              
-                  
+         
+            
+            
               </TableRow>
               ))}
               </React.Fragment>
@@ -483,57 +496,7 @@ const handleAproveHealthFacility=async(id)=>{
       </TableContainer>
       </Container>
     </Page>
-    <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>user information</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            please provide user unformation. We
-            will send updates occasionally.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="FullNames"
-            label="Full Names"
-            type="text"
-            fullWidth
-            variant="standard"
-          />
-           <TextField
-            autoFocus
-            margin="dense"
-            id="email"
-            label="Email Address"
-            type="email"
-            fullWidth
-            variant="standard"
-          />
-            <TextField
-          id="outlined-select-currency-native"
-          select
-          label="Native select"
-          value={role}
-          fullWidth
-          variant="standard"
-          onChange={handleChange}
-          SelectProps={{
-            native: true,
-          }}
-          helperText="Please select the Role"
-        >
-          {roles.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </TextField>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button onClick={handleClose}>Save</Button>
-        </DialogActions>
-      </Dialog>
-
+   
     </React.Fragment>
    
   );

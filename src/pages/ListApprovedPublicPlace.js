@@ -22,9 +22,15 @@ import {
   Typography,
   TableContainer,
   TablePagination,
+  Grid,
+  CardHeader, CardContent,
 } from '@mui/material';
-
-
+import { useTheme } from '@mui/material/styles';
+import {
+ 
+  AppCurrentVisits,
+ 
+} from '../sections/@dashboard/app';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -54,7 +60,7 @@ import moment from "moment";
 import jsPdf from "jspdf";
 import autoTable from 'jspdf-autotable';
 import logo from "../components/images/logo.png";
-
+import MenuItem from '@mui/material/MenuItem';
 // ----------------------------------------------------------------------
 
 // ----------------------------------------------------------------------
@@ -89,6 +95,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function School() {
+  const theme = useTheme();
   const [page, setPage] = useState(0);
 
   const [order, setOrder] = useState('asc');
@@ -115,6 +122,272 @@ export default function School() {
  const [results, setResults] = useState({});
  const [search, setSearch] = useState(false);
 
+ /////filtering
+const [province,setProvince]=useState('')
+const [provinceName,setProvinceName]=useState('')
+const [provincesData,setProvincesData]=useState([]);
+
+const [districtsData,setDistrictsData]=useState([]); 
+const [district,setDistrict]=useState('')
+const [districtName,setDistrictName]=useState('')
+
+const [sectorsData,setSectorsData]=useState([]);
+const  [sector,setSector]=useState('')
+const [sectorName,setSectorName]=useState('');
+
+const [cellsData,setCellsData]=useState([]);
+const [cell,setCell]=useState('');
+const [cellName,setCellName]=useState('')
+
+const [ villagesData,setVillagesData]=useState([])
+const [village,setVillage]=useState('')
+const [villageName,setVillageName]=useState('')
+const [pieData, setPieData] = useState([]);
+useEffect(()=>{
+  async function fetchProvinces(){
+await axios.get('http://localhost:8000/api/provinces').then((response)=>{
+  setProvincesData(response.data.data)
+  console.log("province ::",provincesData )
+}).catch((error)=>{
+  console.log(error)
+})}
+  
+  fetchProvinces()
+},[])
+
+console.log("province name::",provincesData ,provinceName,districtName,sectorName,cellName,villageName)
+const handleChange =async (event) => {
+  setProvince(event.target.value);
+  provincesData.map((p)=>{
+    if(p.id===event.target.value){
+      setProvinceName(p.Provinces)
+      
+    }
+  })
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/districts/${event.target.value}`).then((response)=>{
+          setDistrictsData(response.data.data)
+}).catch((error)=>{
+  console.log(error)
+})
+  }
+ 
+};
+
+
+const handleDistrictChange =async (event) => {
+  setDistrict(event.target.value);
+ 
+  districtsData.map((p)=>{
+    if(p.id===event.target.value){
+      setDistrictName(p.Districts) 
+     
+    }
+  });
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/sectors/${event.target.value}`).then((response)=>{
+          setSectorsData(response.data.data)
+          
+}).catch((error)=>{
+  console.log(error)
+})}
+
+
+};
+
+
+
+
+const handleSectorChange =async (event) => {
+  setSector(event.target.value);
+  sectorsData.map((p)=>{
+    if(p.id===event.target.value){
+      setSectorName(p.Sectors)   
+    }
+  });
+   if(event.target.value){
+       await axios.get(`http://localhost:8000/api/cells/${event.target.value}`).then((response)=>{
+           setCellsData(response.data.data)
+        
+}).catch((error)=>{
+   console.log(error)
+})}
+
+};
+
+
+const handleCellChange =async (event) => {
+  setCell(event.target.value);
+  cellsData.map((p)=>{
+    if(p.id===event.target.value){
+      setCellName(p.Cells)
+      
+    }
+  })
+  if(event.target.value){
+      await axios.get(`http://localhost:8000/api/villages/${event.target.value}`).then((response)=>{
+          setVillagesData(response.data.data);  
+          setVillage(event.target.value);
+    
+}).catch((error)=>{
+  console.log(error)
+})}
+
+};
+
+const handleVillageChange =async (event) => {
+  setVillage(event.target.value);
+  villagesData.map((p)=>{
+    if(p.id===event.target.value){
+      setVillageName(p.villages)
+      
+    }
+  })
+
+};
+
+ ////////////////////////////////////////////////////////////
+
+ async function fetchDistrictData(){
+  const labelSet = [];
+  let SafelyManagedServices = 0;
+  let BasicServices = 0;
+  let LimitedServices = 0;
+  let UnimprovedWaterSource = 0;
+  await axios
+    .post(
+      `http://localhost:8000/api/publicplaces/publicplacebydistrictname`,
+      {
+         districtName:districtName.replaceAll(/\s/g, ''),
+       // districtName:districtName,
+      }
+    )
+    .then(function(response) {
+      
+      const res = response.data.data;
+      return res;
+    })
+    .then(function(res) {
+      console.log("ggg DIST4",res)
+      for (const key in res) {
+        let source = res[key].source;
+        let distance=res[key].how_long
+        if (source=== "Packaged bottled water" || distance==="On premises") {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "Rainwater" || distance==="Up to 500 m") {
+          BasicServices = BasicServices + 1;
+        } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds") {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+        }
+      }
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Basic Services", value: BasicServices },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+      ];
+      setPieData(data);
+    })
+    .catch(function(error) {
+      console.log("error", error);
+    });
+
+}
+const [sectorpieData, setSectorpieData] = useState([]);
+async function fetchSectorData(){
+  const labelSet = [];
+  let SafelyManagedServices = 0;
+  let BasicServices = 0;
+  let LimitedServices = 0;
+  let UnimprovedWaterSource = 0;
+  await axios
+    .post(
+      `http://localhost:8000/api/publicplaces/publicplacebysectorname`,
+      {
+         sectorName:sectorName.replaceAll(/\s/g, ''),
+      //  sectorName:sectorName,
+      }
+    )
+    .then(function(response) {
+      
+      const res = response.data.data;
+      return res;
+    })
+    .then(function(res) {
+      console.log("ggg ",res)
+      for (const key in res) {
+        let source = res[key].source;
+        let distance=res[key].how_long
+        if (source=== "Packaged bottled water" || distance==="On premises") {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "Rainwater" || distance==="Up to 500 m") {
+          BasicServices = BasicServices + 1;
+        } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds") {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+        }
+      }
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Basic Services", value: BasicServices },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+      ];
+      setSectorpieData(data);
+    })
+    .catch(function(error) {
+      console.log("error", error);
+    });
+}
+const [cellpieData, setCellpieData] = useState([]);
+async function fetchCellData(){
+  const labelSet = [];
+  let SafelyManagedServices = 0;
+  let BasicServices = 0;
+  let LimitedServices = 0;
+  let UnimprovedWaterSource = 0;
+  await axios
+    .post(
+      `http://localhost:8000/api/publicplaces/publicplacebycellname`,
+      {
+         cellName:cellName.replaceAll(/\s/g, ''),
+       // cellName:cellName,
+      }
+    )
+    .then(function(response) {
+      const res = response.data.data;
+      return res;
+    })
+    .then(function(res) {
+      console.log("ggg ",res)
+      for (const key in res) {
+        let source = res[key].source;
+        let distance=res[key].how_long
+        if (source=== "Packaged bottled water" || distance==="On premises") {
+          SafelyManagedServices = SafelyManagedServices + 1;
+        } else if (source === "Rainwater" || distance==="Up to 500 m") {
+          BasicServices = BasicServices + 1;
+        } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds") {
+          LimitedServices = LimitedServices + 1;
+        } else {
+          UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
+        }
+      }
+      const data = [
+        { label: "Safely Managed Services", value: SafelyManagedServices},
+        { label: "Basic Services", value: BasicServices },
+        { label: "Limited Services", value: LimitedServices },
+        { label: "Unimproved Water Source", value: UnimprovedWaterSource},
+      ];
+      setCellpieData(data);
+    })
+    .catch(function(error) {
+      console.log("error", error);
+    });
+}
  const handleFeedBack=(id)=>{
     setOpenFeedBack(true)
    }
@@ -129,7 +402,7 @@ export default function School() {
     doc.setFont("Helvertica", "normal");
     doc.text(`Date ${todaydate}`, 140, 65);
     doc.setFont("Helvertica", "bold");
-    doc.text("Liste of approved Public Place", 70, 75);
+    doc.text("Public Places Report ", 70, 75);
      const tableColumn=['Name','Province','District','Source','status']
     const tableRows=[]
   
@@ -182,11 +455,16 @@ export default function School() {
     }
   }
   fetchData();
+  if(districtName){
+    fetchDistrictData()
+  }
+  if(sectorName){
+    fetchSectorData()
+  }
+  if(cellName){
+    fetchCellData()
+  }
 }, [getPublicPlaces.details]);
-  const handleChange = (event) => {
-    setRole(event.target.value);
-  };
-
 
   const handleClose = () => {
     setOpen(false);
@@ -245,6 +523,93 @@ export default function School() {
 
   return (
     <React.Fragment>
+    <DialogTitle>Please select ...</DialogTitle>
+    <Box
+    component="form"
+    sx={{
+      '& .MuiTextField-root': { m: 1, width: '25ch' },
+    }}
+    noValidate
+    autoComplete="off"
+  >
+    <div>
+      <TextField
+        id="standard-select-currency"
+        select
+        label=""
+        value={province}
+        name={province}
+        onChange={handleChange}
+        helperText="Please select your province"
+        variant="standard"
+      >
+        {provincesData.map((option) => (
+          <MenuItem key={option.id} value={option.id} name={option.Provinces} >
+            {option.Provinces}
+          </MenuItem>
+        ))}
+      </TextField>
+      
+        <TextField
+        id="standard-select-currency-native"
+        select
+        label=""
+        value={district}
+        name={district}
+        onChange={handleDistrictChange}
+        SelectProps={{
+          native: true,
+        }}
+        helperText="Please select your district"
+        variant="standard"
+      >
+        {districtsData.map((option) => (
+          <option key={option.id} value={option.id} name={option.Districts}>
+            {option.Districts}
+          </option>
+        ))}
+      </TextField>
+    
+      <TextField
+      id="standard-select-currency-native"
+      select
+      label=""
+      value={sector}
+      name={sector}
+      onChange={handleSectorChange}
+      SelectProps={{
+        native: true,
+      }}
+      helperText="Please select your sector"
+      variant="standard"
+    >
+      {sectorsData.map((option) => (
+        <option key={option.id} value={option.id} name={option.Sectors}>
+          {option.Sectors}
+        </option>
+      ))}
+    </TextField>
+    <TextField
+    id="standard-select-currency-native"
+    select
+    label=""
+    value={cell}
+    name={cell}
+    onChange={handleCellChange}
+    SelectProps={{
+      native: true,
+    }}
+    helperText="Please select your cell"
+    variant="standard"
+  >
+    {cellsData.map((option) => (
+      <option key={option.id} value={option.id} name={option.Cells}>
+        {option.Cells}
+      </option>
+    ))}
+  </TextField>
+    </div>
+  </Box>
     <Dialog onClose={handleClose} open={openFeedBack}>
     <DialogTitle>Provide feedbak</DialogTitle>
     <Box
@@ -269,14 +634,93 @@ export default function School() {
     <ButtonGroup variant="text" aria-label="text button group">
                   <Button onClick={handleClose} >Close</Button>
               
-                 
                 </ButtonGroup>
   </Dialog>
+
+  <Box
+  component="form"
+  sx={{
+    '& .MuiTextField-root': { m: 1, width: '25ch',height:'25ch' },
+  }}
+  noValidate
+  autoComplete="off"
+>
+<Grid item xs={12} md={6} lg={4}>
+        <Card >
+        <CardHeader title="Public Place Information Analytics" subheader="Distric/sector/cell" />
+        <CardContent>
+          <Box
+            sx={{
+              display: 'grid',
+              gap: 2,
+              gridTemplateColumns: 'repeat(2, 1fr)',
+            }}
+          >
+        
+{
+districtName?
+
+<Grid item xs={12} md={6} lg={4}>
+{console.log("district name...:",pieData)}
+<AppCurrentVisits
+  title="District Analytics"
+  chartData={pieData}
+  chartColors={[
+    theme.palette.primary.main,
+    theme.palette.chart.blue[0],
+    theme.palette.chart.violet[0],
+    theme.palette.chart.yellow[0],
+  ]}
+/>
+</Grid>
+:null
+}
+
+
+         {
+          sectorName?
+          <Grid item xs={12} md={6} lg={4}>
+          <AppCurrentVisits
+            title="Sector Analytics"
+            chartData={sectorpieData}
+            chartColors={[
+              theme.palette.primary.main,
+              theme.palette.chart.blue[0],
+              theme.palette.chart.violet[0],
+              theme.palette.chart.yellow[0],
+            ]}
+          />
+        </Grid>
+          :null
+         }
+       {
+        cellName?
+        <Grid item xs={12} md={6} lg={4}>
+        <AppCurrentVisits
+          title="Cell Analytics"
+          chartData={cellpieData}
+          chartColors={[
+            theme.palette.primary.main,
+            theme.palette.chart.blue[0],
+            theme.palette.chart.violet[0],
+            theme.palette.chart.yellow[0],
+          ]}
+        />
+      </Grid>
+        :null
+       }
+          </Box>
+          </CardContent>
+
+        </Card>
+        </Grid>
+
+</Box>
      <Page title="User">
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-          List of Approved   Puplic Places
+          Collected Data for Puplic Places
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User

@@ -50,20 +50,20 @@ import { getSchoolsAction } from '../redux/actions/schoolsAction';
 
 // ----------------------------------------------------------------------
 const roles=[{
-  value:"SuperAdmin",
-  label:"Super Admin"
-},
-{
   value:"Admin",
   label:"Admin"
 },
 {
-  value:"User",
-  label:"User"
+  value:"DataAnalyst",
+  label:"Data Analyst"
 },
 {
-  value:"OrganistionLeader",
-  label:"Organistion Leader"
+  value:"DataCollector",
+  label:"Data Collector"
+},
+{
+  value:"OrganistionAnalyst",
+  label:"Organistion Analyst"
 },
 ]
 
@@ -381,9 +381,67 @@ const handleRejectSchool=async(id)=>{
                 key={details.id}
                 selected={selectedExamIds.indexOf(details.id) !== -1}
               >
-             
-            <React.Fragment>
-            <TableCell align="center">{details.name}</TableCell>
+              {
+                details.status=="Pending"?
+                <React.Fragment>
+                <TableCell align="center">{details.name}</TableCell>
+                    <TableCell component="th" scope="row">
+                      {details.source}
+                    </TableCell>
+                   
+                    <TableCell align="center">{details.how_long}</TableCell>
+                    <TableCell align="center">{details.level}</TableCell>
+                    <TableCell align="center">{details.status}</TableCell>
+                    <TableCell align="center">
+    
+                    <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      '& > *': {
+                        m: 1,
+                      },
+                    }}
+                    >
+                    
+                    <ButtonGroup variant="text" aria-label="text button group">
+                      <Button onClick={async()=>{
+                        handleAproveSchool(details.id)
+                       }}>Approve</Button>
+                      <Button onClick={()=>{
+                        handleRejectSchool(details.id)
+                      }}>Reject</Button>
+                      <Button onClick={()=>{
+                        handleFeedBack(details.id)
+                      }}>Feed Back</Button>
+                    </ButtonGroup>
+                    </Box>
+          
+                  
+                    </TableCell>
+                </React.Fragment>
+                :null
+              }
+           
+                
+              </TableRow>
+              ))}
+              </React.Fragment>
+            ):(
+              
+              <React.Fragment>
+              {schoolsDetails.slice(0, limit).map((details) => (
+              <TableRow
+                hover
+                key={details.id}
+                selected={selectedExamIds.indexOf(details.id) !== -1}
+              >
+              
+            {
+              details.status=="Pending"?
+              <React.Fragment>
+              <TableCell align="center">{details.name}</TableCell>
                 <TableCell component="th" scope="row">
                   {details.source}
                 </TableCell>
@@ -420,60 +478,10 @@ const handleRejectSchool=async(id)=>{
               
                 </TableCell>
             </React.Fragment>
-                
-              </TableRow>
-              ))}
-              </React.Fragment>
-            ):(
-              
-              <React.Fragment>
-              {schoolsDetails.slice(0, limit).map((details) => (
-              <TableRow
-                hover
-                key={details.id}
-                selected={selectedExamIds.indexOf(details.id) !== -1}
-              >
-              
-            
+              :null
+            }
          
-            <React.Fragment>
-                <TableCell align="center">{details.name}</TableCell>
-                  <TableCell component="th" scope="row">
-                    {details.source}
-                  </TableCell>
-                 
-                  <TableCell align="center">{details.how_long}</TableCell>
-                  <TableCell align="center">{details.level}</TableCell>
-                  <TableCell align="center">{details.status}</TableCell>
-                  <TableCell align="center">
-  
-                  <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    '& > *': {
-                      m: 1,
-                    },
-                  }}
-                  >
-                  
-                  <ButtonGroup variant="text" aria-label="text button group">
-                    <Button onClick={async()=>{
-                      handleAproveSchool(details.id)
-                     }}>Approve</Button>
-                    <Button onClick={()=>{
-                      handleRejectSchool(details.id)
-                    }}>Reject</Button>
-                    <Button onClick={()=>{
-                      handleFeedBack(details.id)
-                    }}>Feed Back</Button>
-                  </ButtonGroup>
-                  </Box>
-        
-                
-                  </TableCell>
-              </React.Fragment>
+           
                   
             
               </TableRow>

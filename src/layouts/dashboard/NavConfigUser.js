@@ -26,7 +26,7 @@ const navConfigUser = [
   },
   {
     title: 'Public Place',
-    path: '/dashboard/schools',
+    path: '/dashboard/publicplacerejected',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
   {

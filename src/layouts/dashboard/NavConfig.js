@@ -39,17 +39,17 @@ const navConfig = [
     path: '/dashboard/publicplaceapproved',
     icon: getIcon('eva:pie-chart-2-fill'),
   },
-  {
-    title: 'data collection',
-    path: '/dashboard/user',
-    icon: getIcon('eva:people-fill'),
-  },
+  // {
+  //   title: 'data collection',
+  //   path: '/dashboard/user',
+  //   icon: getIcon('eva:people-fill'),
+  // },
  
-  {
-    title: 'Organizations',
-    path: '/dashboard/organizations',
-    icon: getIcon('eva:file-text-fill'),
-  },
+  // {
+  //   title: 'Organizations',
+  //   path: '/dashboard/organizations',
+  //   icon: getIcon('eva:file-text-fill'),
+  // },
   {
     title: '',
     path: '/404',

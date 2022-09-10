@@ -296,7 +296,7 @@ const handleVillageChange =async (event) => {
     doc.setFont("Helvertica", "normal");
     doc.text(`Date ${todaydate}`, 140, 65);
     doc.setFont("Helvertica", "bold");
-    doc.text("Liste of approved households", 70, 75);
+    doc.text("Households Report", 70, 75);
      const tableColumn=['Phone','Province','District','Source','status']
     const tableRows=[]
   
@@ -392,6 +392,7 @@ const [pieData, setPieData] = useState([]);
         `http://localhost:8000/api/households/householdbydistrictname`,
         {
           districtName:districtName.replaceAll(/\s/g, ''),
+         // districtName:districtName,
         }
       )
       .then(function(response) {
@@ -446,7 +447,8 @@ const [pieData, setPieData] = useState([]);
       .post(
         `http://localhost:8000/api/households/householdbysectorname`,
         {
-          sectorName:sectorName.replaceAll(/\s/g, ''),
+           sectorName:sectorName.replaceAll(/\s/g, ''),
+         // sectorName:sectorName,
         }
       )
       .then(function(response) {
@@ -494,7 +496,8 @@ const [pieData, setPieData] = useState([]);
       .post(
         `http://localhost:8000/api/households/householdbycellname`,
         {
-          cellName:cellName.replaceAll(/\s/g, ''),
+           cellName:cellName.replaceAll(/\s/g, ''),
+          //cellName:cellName,
         }
       )
       .then(function(response) {
@@ -781,7 +784,7 @@ const [pieData, setPieData] = useState([]);
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-          List of Approved   HouseHold
+          Collected Data for HouseHold
           </Typography>
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
             New User

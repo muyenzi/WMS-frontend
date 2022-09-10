@@ -29,7 +29,7 @@ export const loginAction = (user,navigate) => async (dispatch) => {
       const userData={email,role,fullName}
       console.log("object",email,role,userData)
       dispatch(loginSuccess(data));
-      if(role==="SuperAdmin" || role==="Admin" || role=="User"){
+      if(role==="Admin" || role==="DataCollector" || role=="DataController"){
         navigate('/dashboard/app', { replace: true });
       return (localStorage.setItem('wmsAuth',token),localStorage.setItem('userAuth',JSON.stringify(userData)));
       }

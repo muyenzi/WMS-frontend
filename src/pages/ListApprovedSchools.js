@@ -27,15 +27,9 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import {
-  AppTasks,
-  AppNewsUpdate,
-  AppOrderTimeline,
+ 
   AppCurrentVisits,
-  AppWebsiteVisits,
-  AppTrafficBySite,
-  AppWidgetSummary,
-  AppCurrentSubject,
-  AppConversionRates,
+ 
 } from '../sections/@dashboard/app';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -63,10 +57,8 @@ import 'chart.js/auto';
 import {Pie} from 'react-chartjs-2';
 // mock
 import USERLIST from '../_mock/user';
-
 import { getUsersAction } from "../redux/actions/getUsersAction"
 import { getSchoolsAction } from '../redux/actions/schoolsAction';
-
 // ----------------------------------------------------------------------
 
 
@@ -259,8 +251,8 @@ const handleVillageChange =async (event) => {
    doc.setFont("Helvertica", "normal");
    doc.text(`Date ${todaydate}`, 140, 65);
    doc.setFont("Helvertica", "bold");
-   doc.text("Liste of approved schools", 70, 75);
-    const tableColumn=['Name','Province','District','Level','status']
+   doc.text("Schools Report", 70, 75);
+    const tableColumn=['Name','Province','District','Source','Level','status']
    const tableRows=[]
  
    schoolsDetails.map(school =>{
@@ -268,6 +260,7 @@ const handleVillageChange =async (event) => {
        school.name,
        school.prov_name,
        school.dis_name,
+       school.source,
        school.level,
        school.status,
       // format(new Date(student.updated_at), "yyyy-MM-dd")
@@ -275,7 +268,6 @@ const handleVillageChange =async (event) => {
       if(school.status==="Approved"){
      tableRows.push(schoolData);
       }
-     
    });
   
    doc.autoTable(tableColumn, tableRows, { 
@@ -331,7 +323,8 @@ const [pieData, setPieData] = useState([]);
       .post(
         `http://localhost:8000/api/schools/schoolsbydistrictname`,
         {
-          districtName:districtName.replaceAll(/\s/g, ''),
+           districtName:districtName.replaceAll(/\s/g, ''),
+         // districtName:districtName,
         }
       )
       .then(function(response) {
@@ -344,11 +337,11 @@ const [pieData, setPieData] = useState([]);
         for (const key in res) {
           let source = res[key].source;
           let distance=res[key].how_long
-          if (source=== "Packaged bottled water" || distance==="On premises ") {
+          if (source=== "Packaged bottled water" || distance==="On premises") {
             SafelyManagedServices = SafelyManagedServices + 1;
           } else if (source === "Rainwater" || distance==="Up to 500 m") {
             BasicServices = BasicServices + 1;
-          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds") {
             LimitedServices = LimitedServices + 1;
           } else {
             UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
@@ -369,7 +362,6 @@ const [pieData, setPieData] = useState([]);
   }
 
   const [sectorpieData, setSectorpieData] = useState([]);
-
   async function fetchSectorData(){
     const labelSet = [];
     let SafelyManagedServices = 0;
@@ -380,7 +372,8 @@ const [pieData, setPieData] = useState([]);
       .post(
         `http://localhost:8000/api/schools/schoolsbysectorname`,
         {
-          sectorName:sectorName.replaceAll(/\s/g, ''),
+           sectorName:sectorName.replaceAll(/\s/g, ''),
+        //  sectorName:sectorName,
         }
       )
       .then(function(response) {
@@ -393,11 +386,11 @@ const [pieData, setPieData] = useState([]);
         for (const key in res) {
           let source = res[key].source;
           let distance=res[key].how_long
-          if (source=== "Packaged bottled water" || distance==="On premises ") {
+          if (source=== "Packaged bottled water" || distance==="On premises") {
             SafelyManagedServices = SafelyManagedServices + 1;
           } else if (source === "Rainwater" || distance==="Up to 500 m") {
             BasicServices = BasicServices + 1;
-          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds") {
             LimitedServices = LimitedServices + 1;
           } else {
             UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
@@ -416,9 +409,7 @@ const [pieData, setPieData] = useState([]);
       });
   
   }
-
   const [cellpieData, setCellpieData] = useState([]);
-
   async function fetchCellData(){
     const labelSet = [];
     let SafelyManagedServices = 0;
@@ -429,11 +420,11 @@ const [pieData, setPieData] = useState([]);
       .post(
         `http://localhost:8000/api/schools/schoolsbycellname`,
         {
-          cellName:cellName.replaceAll(/\s/g, ''),
+           cellName:cellName.replaceAll(/\s/g, ''),
+         // cellName:cellName,
         }
       )
       .then(function(response) {
-        
         const res = response.data.data;
         return res;
       })
@@ -442,11 +433,11 @@ const [pieData, setPieData] = useState([]);
         for (const key in res) {
           let source = res[key].source;
           let distance=res[key].how_long
-          if (source=== "Packaged bottled water" || distance==="On premises ") {
+          if (source=== "Packaged bottled water" || distance==="On premises") {
             SafelyManagedServices = SafelyManagedServices + 1;
           } else if (source === "Rainwater" || distance==="Up to 500 m") {
             BasicServices = BasicServices + 1;
-          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds.") {
+          } else if (source === "Protected well/spring" || distance==="500 m or further Note: On premises means within the building or facility grounds") {
             LimitedServices = LimitedServices + 1;
           } else {
             UnimprovedWaterSource =  UnimprovedWaterSource  + 1;
@@ -630,9 +621,12 @@ const [pieData, setPieData] = useState([]);
                 gridTemplateColumns: 'repeat(2, 1fr)',
               }}
             >
+          
 {
   districtName?
+  
   <Grid item xs={12} md={6} lg={4}>
+  {console.log("district name...:",districtName)}
   <AppCurrentVisits
     title="District Analytics"
     chartData={pieData}
@@ -719,7 +713,7 @@ const [pieData, setPieData] = useState([]);
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            List of Aproved Schools
+            Collected Data For Schools
           </Typography>
           
           {/* <Button variant="contained" component={RouterLink} onClick={handleClickOpen} to="#" startIcon={<Iconify icon="eva:plus-fill" />}>
